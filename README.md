@@ -28,7 +28,7 @@ POST    /shorten        body{ url:String }
 GET     /urls
 GET     /urls/newest   
 GET     /urls/:code
-DELETE  /urls/:code
+DELETE  /urls/:code?apiKey=:apikey
 GET     /               Landing page
 GET     /:code          Redirect to long url
 GET     /*              404 page
