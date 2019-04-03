@@ -6,13 +6,15 @@ services:
     tty: false
     restart: always
     ports:
-      - 1323:1323
+      - 1323
+    environment:
+      - MONGO_DB=mongodb://mongo_urlshortener:27017
     depends_on:
       - db
 
   db:
     image: mongo
-    container_name: "mongo_shorturls"
+    container_name: "mongo_urlshortener"
     ports:
       - 27017:27017
     volumes:

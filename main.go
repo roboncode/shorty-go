@@ -13,6 +13,7 @@ import (
 	"go.mongodb.org/mongo-driver/x/bsonx"
 	"log"
 	"net/http"
+	"os"
 	"strconv"
 	"time"
 )
@@ -67,6 +68,7 @@ func setupHashIds() *hashids.HashID {
 }
 
 func readConfig() {
+
 	viper.SetDefault("mongoUrl", "mongodb://localhost:27017")
 	viper.SetDefault("database", "shorturls")
 	viper.SetDefault("hashSalt", "shorturls")
@@ -80,6 +82,11 @@ func readConfig() {
 		log.Println(color.Red("No config file found. Using default settings"))
 	} else {
 		log.Println(color.Green("Config found -- overriding defaults"))
+	}
+
+	mongoUrl := os.Getenv("MONGO_DB")
+	if mongoUrl != "" {
+		viper.Set("mongoUrl", mongoUrl)
 	}
 }
 

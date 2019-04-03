@@ -4,6 +4,21 @@ A simple URL shortener using Go and Mongo.
 
 This project was built using [Echo](https://echo.labstack.com/) and the official [Go MongoDb Driver](https://github.com/mongodb/mongo-go-driver).
 
+## TLDR;
+
+Use the Makefile to run docker
+
+```
+make start
+```
+
+Local development
+
+```
+make mongo
+go run main.go
+```
+
 ## API
 
 The API is pretty simple.
