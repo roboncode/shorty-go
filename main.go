@@ -75,6 +75,7 @@ func readConfig() {
 	viper.SetDefault("hashMin", 5)
 	viper.SetDefault("address", ":1323")
 	viper.SetDefault("baseUrl", "")
+	viper.SetDefault("apiKey", "")
 	viper.SetConfigName("config")
 	viper.AddConfigPath(".")
 	err := viper.ReadInConfig() // Find and read the config file
@@ -236,8 +237,14 @@ func GetCode(c echo.Context) error {
 }
 
 func DeleteCode(c echo.Context) error {
-	var result interface{}
-	return c.JSON(http.StatusOK, result)
+	if viper.GetString("apiKey") == c.QueryParam("apikey") {
+		collection := db.Collection("links")
+		ctx, _ := context.WithTimeout(context.Background(), 5*time.Second)
+		_, _ = collection.DeleteOne(ctx, bson.M{
+			"code": c.Param("code"),
+		})
+	}
+	return c.JSON(http.StatusOK, nil)
 }
 
 func RedirectToUrl(c echo.Context) error {
