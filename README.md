@@ -34,9 +34,9 @@ DELETE  /urls/:code
 
 No Authentication required
 
-GET     /                           Landing page
-GET     /:code                      Redirect to long url
-GET     /*                          404 page
+GET     /               Landing page
+GET     /:code          Redirect to long url
+GET     /*              404 page
 ```
 
 Feel free to fork and build on it. It works for my purposes.
