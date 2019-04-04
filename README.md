@@ -27,10 +27,10 @@ The API is pretty simple.
 Authentication required - uri?key=:authKey
 
 POST    /shorten        body{ url:String }
-GET     /urls
-GET     /urls/newest 
-GET     /urls/:code
-DELETE  /urls/:code
+GET     /links?l=:limit&s=:skip
+GET     /links/newest 
+GET     /links/:code
+DELETE  /links/:code
 
 No Authentication required
 
