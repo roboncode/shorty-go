@@ -24,8 +24,8 @@ type Counter struct {
 
 type Link struct {
 	ID       interface{} `json:"id,omitempty" bson:"_id,omitempty"`
-	Url      string      `json:"url" bson:"url"`
 	Code     string      `json:"code" bson:"code"`
+	LongUrl  string      `json:"longUrl" bson:"longUrl"`
 	ShortUrl string      `json:"shortUrl,omitempty" bson:"shortUrl,omitempty"`
 	Created  time.Time   `json:"created" bson:"created"`
 }
@@ -168,12 +168,12 @@ func CreateLink(c echo.Context) error {
 	collection := db.Collection(collectionName)
 	ctx, _ := context.WithTimeout(context.Background(), 5*time.Second)
 	if err := collection.FindOne(ctx, bson.M{
-		"url": body.Url,
+		"longUrl": body.Url,
 	}).Decode(&link); err != nil {
 		counter := getCounter()
 		code, _ := h.Encode([]int{counter})
 		link = Link{
-			Url:     body.Url,
+			LongUrl: body.Url,
 			Code:    code,
 			Created: time.Now(),
 		}
@@ -268,5 +268,5 @@ func RedirectToUrl(c echo.Context) error {
 	if err != nil {
 		return c.Redirect(http.StatusTemporaryRedirect, "/404")
 	}
-	return c.Redirect(http.StatusMovedPermanently, link.Url)
+	return c.Redirect(http.StatusMovedPermanently, link.LongUrl)
 }

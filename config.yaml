@@ -1,5 +1,5 @@
 address: ":1323"
-baseUrl: "https://roboncode.com"
+baseUrl: "https://ac.me"
 mongoUrl: "mongodb://localhost:27017"
 database: "shorturls"
 authKey: "123456789"
