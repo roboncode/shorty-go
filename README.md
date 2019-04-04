@@ -2,7 +2,7 @@
 
 A simple URL shortener using Go and Mongo.
 
-This project was built using [Echo](https://echo.labstack.com/) and the official [Go MongoDb Driver](https://github.com/mongodb/mongo-go-driver).
+This project was built using [Echo](https://echo.labstack.com/) and the official [Go MongoDb Driver](https://github.com/mongodb/mongo-go-driver). Since the app is pretty simple, <300 lines, it exists as a single file.
 
 ## TLDR;
 
@@ -39,6 +39,6 @@ GET     /:code          Redirect to long url
 GET     /*              404 page
 ```
 
-Feel free to fork and build on it. It works for my purposes.
+Feel free to fork it, hack it and use it any way you please.
 
 **MIT License**
