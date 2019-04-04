@@ -1,19 +1,18 @@
 package main
 
 import (
-	"context"
+	"encoding/json"
+	"fmt"
+	"github.com/dgraph-io/badger"
 	"github.com/labstack/echo"
 	"github.com/labstack/echo/middleware"
 	"github.com/labstack/gommon/color"
 	"github.com/speps/go-hashids"
 	"github.com/spf13/viper"
-	"go.mongodb.org/mongo-driver/bson"
-	"go.mongodb.org/mongo-driver/mongo"
-	"go.mongodb.org/mongo-driver/mongo/options"
-	"go.mongodb.org/mongo-driver/x/bsonx"
 	"log"
 	"net/http"
 	"os"
+	"roboncode.com/go-urlshortener/stores"
 	"strconv"
 	"time"
 )
@@ -30,35 +29,8 @@ type Link struct {
 	Created  time.Time   `json:"created" bson:"created"`
 }
 
-var collectionName = "links"
-var db *mongo.Database
+var store stores.Store
 var h *hashids.HashID
-
-func getCounter() int {
-	var counter Counter
-	collection := db.Collection("counter")
-	ctx, _ := context.WithTimeout(context.Background(), 5*time.Second)
-	opts := options.FindOneAndUpdateOptions{}
-	opts.SetUpsert(true)
-	opts.SetReturnDocument(options.ReturnDocument(options.After))
-	err := collection.FindOneAndUpdate(ctx, bson.M{}, bson.M{"$inc": bson.M{"value": 1}}, &opts).Decode(&counter)
-	if err != nil {
-		return 0
-	}
-	return counter.Value
-}
-
-func connectToDatabase() *mongo.Database {
-	var err error
-	ctx, _ := context.WithTimeout(context.Background(), 10*time.Second)
-	client, err := mongo.Connect(ctx, options.Client().ApplyURI(viper.GetString("mongoUrl")))
-	if err != nil {
-		log.Fatal(err)
-	}
-	log.Println(color.Green("Successfully connected to database"))
-	dbName := viper.GetString("database")
-	return client.Database(dbName)
-}
 
 func setupHashIds() *hashids.HashID {
 	hd := hashids.NewData()
@@ -69,7 +41,6 @@ func setupHashIds() *hashids.HashID {
 }
 
 func readConfig() {
-
 	viper.SetDefault("mongoUrl", "mongodb://localhost:27017")
 	viper.SetDefault("database", "shorturls")
 	viper.SetDefault("hashSalt", "shorturls")
@@ -92,29 +63,55 @@ func readConfig() {
 	}
 }
 
-func populateShortUrl(link *Link) {
-	link.ShortUrl = viper.GetString("baseUrl") + "/" + link.Code
-}
-
-func ensureIndexes() {
-	collection := db.Collection(collectionName)
-	_, err := collection.Indexes().CreateOne(
-		context.Background(),
-		mongo.IndexModel{
-			Keys:    bsonx.Doc{{"code", bsonx.Int32(1)}},
-			Options: options.Index().SetUnique(true).SetBackground(true),
-		},
-	)
+func setupBadger() {
+	opts := badger.DefaultOptions
+	opts.Dir = "./data/badger"
+	opts.ValueDir = "./data/badger"
+	db, err := badger.Open(opts)
 	if err != nil {
 		log.Fatal(err)
 	}
+	defer db.Close()
+
+	err = db.Update(func(txn *badger.Txn) error {
+		err := txn.Set([]byte("answer"), []byte(`{"num":6.13,"strs":["a","b"]}`))
+		return err
+	})
+
+	err = db.View(func(txn *badger.Txn) error {
+		var err error
+		var item *badger.Item
+		item, err = txn.Get([]byte("answer"))
+		if err != nil {
+			log.Fatal(err)
+		}
+
+		var dat = new(struct {
+			Num  float32  `json:"num,omitempty"`
+			Strs []string `json:"strs,omitempty"`
+		})
+		valCopy, _ := item.ValueCopy(nil)
+		if err := json.Unmarshal(valCopy, &dat); err != nil {
+			panic(err)
+		}
+		fmt.Println(dat.Num, dat.Strs[1])
+
+		//err = db.View(func(txn *badger.Txn) error {
+		//	item, _ := txn.Get([]byte("answer"))
+		//	valCopy, _ := item.ValueCopy(nil)
+		//	fmt.Printf("The answer is: %s\n", valCopy)
+		//	return nil
+		//})
+
+		return nil
+	})
 }
 
 func main() {
 	readConfig()
 	h = setupHashIds()
-	db = connectToDatabase()
-	ensureIndexes()
+	store = stores.NewMongoStore()
+	//setupBadger()
 
 	// Echo instance
 	e := echo.New()
@@ -139,7 +136,6 @@ func main() {
 	// Routes
 	e.POST("/shorten", CreateLink)
 	e.GET("/links", GetLinks)
-	e.GET("/links/newest", GetNewestLink)
 	e.GET("/links/:code", GetLink)
 	e.DELETE("/links/:code", DeleteLink)
 	e.File("/", "public/index.html")
@@ -156,6 +152,7 @@ func CreateLink(c echo.Context) error {
 	var body = new(struct {
 		Url string `json:"url"`
 	})
+
 	if err := c.Bind(&body); err != nil {
 		return err
 	}
@@ -164,109 +161,43 @@ func CreateLink(c echo.Context) error {
 		return c.JSON(http.StatusBadRequest, `Missing required property "url"`)
 	}
 
-	var link Link
-	collection := db.Collection(collectionName)
-	ctx, _ := context.WithTimeout(context.Background(), 5*time.Second)
-	if err := collection.FindOne(ctx, bson.M{
-		"longUrl": body.Url,
-	}).Decode(&link); err != nil {
-		counter := getCounter()
-		code, _ := h.Encode([]int{counter})
-		link = Link{
-			LongUrl: body.Url,
-			Code:    code,
-			Created: time.Now(),
-		}
-		ctx, _ = context.WithTimeout(context.Background(), 5*time.Second)
-		res, err := collection.InsertOne(ctx, link)
-		if err != nil {
-			return c.JSON(http.StatusInternalServerError, err)
-		}
-		link.ID = res.InsertedID
-		populateShortUrl(&link)
+	counter := store.IncCount()
+	if code, err := h.Encode([]int{counter}); err != nil {
+		return c.JSON(http.StatusInternalServerError, err)
+	} else if link, err := store.Create(code, body.Url); err != nil {
+		return c.JSON(http.StatusInternalServerError, err)
+	} else {
 		return c.JSON(http.StatusOK, link)
 	}
-
-	return c.JSON(http.StatusOK, link)
-
 }
 
 func GetLinks(c echo.Context) error {
-	// https://danott.co/posts/json-marshalling-empty-slices-to-empty-arrays-in-go.html
-	links := make([]Link, 0) // Do this to ensure empty array
-	collection := db.Collection(collectionName)
-	ctx, _ := context.WithTimeout(context.Background(), 5*time.Second)
 	skip, _ := strconv.ParseInt(c.QueryParam("s"), 10, 64)
 	limit, _ := strconv.ParseInt(c.QueryParam("l"), 10, 64)
-	cursor, err := collection.Find(ctx, bson.M{}, &options.FindOptions{
-		Skip:  &skip,
-		Limit: &limit,
-	})
-	if err != nil {
-		return err
-	}
-	defer cursor.Close(ctx)
-	for cursor.Next(ctx) {
-		var link Link
-		_ = cursor.Decode(&link)
-		populateShortUrl(&link)
-		links = append(links, link)
-	}
-	if err := cursor.Err(); err != nil {
-		return err
-	}
+	links := store.List(limit, skip)
 	return c.JSON(http.StatusOK, links)
 }
 
-func GetNewestLink(c echo.Context) error {
-	var link Link
-	collection := db.Collection(collectionName)
-	ctx, _ := context.WithTimeout(context.Background(), 5*time.Second)
-	err := collection.FindOne(ctx, bson.M{}, &options.FindOneOptions{
-		Sort: map[string]int{"created": -1},
-	}).Decode(&link)
-	if err != nil {
-		var empty interface{}
-		_ = c.JSON(http.StatusOK, empty)
-		return err
-	}
-	populateShortUrl(&link)
-	return c.JSON(http.StatusOK, link)
-}
-
 func GetLink(c echo.Context) error {
-	var link Link
-	collection := db.Collection(collectionName)
-	ctx, _ := context.WithTimeout(context.Background(), 5*time.Second)
-	err := collection.FindOne(ctx, bson.M{
-		"code": c.Param("code"),
-	}).Decode(&link)
-	if err != nil {
-		var empty interface{}
-		_ = c.JSON(http.StatusOK, empty)
-		return err
+	if link, err := store.Read(c.Param("code")); err != nil {
+		return c.NoContent(http.StatusNotFound)
+	} else {
+		return c.JSON(http.StatusOK, link)
 	}
-	return c.JSON(http.StatusOK, link)
 }
 
 func DeleteLink(c echo.Context) error {
-	collection := db.Collection(collectionName)
-	ctx, _ := context.WithTimeout(context.Background(), 5*time.Second)
-	_, _ = collection.DeleteOne(ctx, bson.M{
-		"code": c.Param("code"),
-	})
-	return c.NoContent(http.StatusOK)
+	if count := store.Delete(c.Param("code")); count == 0 {
+		return c.NoContent(http.StatusNotFound)
+	} else {
+		return c.NoContent(http.StatusOK)
+	}
 }
 
 func RedirectToUrl(c echo.Context) error {
-	var link Link
-	collection := db.Collection(collectionName)
-	ctx, _ := context.WithTimeout(context.Background(), 5*time.Second)
-	err := collection.FindOne(ctx, bson.M{
-		"code": c.Param("code"),
-	}).Decode(&link)
-	if err != nil {
+	if link, err := store.Read(c.Param("code")); err != nil {
 		return c.Redirect(http.StatusTemporaryRedirect, "/404")
+	} else {
+		return c.Redirect(http.StatusMovedPermanently, link.LongUrl)
 	}
-	return c.Redirect(http.StatusMovedPermanently, link.LongUrl)
 }
