@@ -1,9 +1,6 @@
 package main
 
 import (
-	"encoding/json"
-	"fmt"
-	"github.com/dgraph-io/badger"
 	"github.com/labstack/echo"
 	"github.com/labstack/echo/middleware"
 	"github.com/labstack/gommon/color"
@@ -14,20 +11,7 @@ import (
 	"os"
 	"roboncode.com/go-urlshortener/stores"
 	"strconv"
-	"time"
 )
-
-type Counter struct {
-	Value int `bson:"value"`
-}
-
-type Link struct {
-	ID       interface{} `json:"id,omitempty" bson:"_id,omitempty"`
-	Code     string      `json:"code" bson:"code"`
-	LongUrl  string      `json:"longUrl" bson:"longUrl"`
-	ShortUrl string      `json:"shortUrl,omitempty" bson:"shortUrl,omitempty"`
-	Created  time.Time   `json:"created" bson:"created"`
-}
 
 var store stores.Store
 var h *hashids.HashID
@@ -63,55 +47,10 @@ func readConfig() {
 	}
 }
 
-func setupBadger() {
-	opts := badger.DefaultOptions
-	opts.Dir = "./data/badger"
-	opts.ValueDir = "./data/badger"
-	db, err := badger.Open(opts)
-	if err != nil {
-		log.Fatal(err)
-	}
-	defer db.Close()
-
-	err = db.Update(func(txn *badger.Txn) error {
-		err := txn.Set([]byte("answer"), []byte(`{"num":6.13,"strs":["a","b"]}`))
-		return err
-	})
-
-	err = db.View(func(txn *badger.Txn) error {
-		var err error
-		var item *badger.Item
-		item, err = txn.Get([]byte("answer"))
-		if err != nil {
-			log.Fatal(err)
-		}
-
-		var dat = new(struct {
-			Num  float32  `json:"num,omitempty"`
-			Strs []string `json:"strs,omitempty"`
-		})
-		valCopy, _ := item.ValueCopy(nil)
-		if err := json.Unmarshal(valCopy, &dat); err != nil {
-			panic(err)
-		}
-		fmt.Println(dat.Num, dat.Strs[1])
-
-		//err = db.View(func(txn *badger.Txn) error {
-		//	item, _ := txn.Get([]byte("answer"))
-		//	valCopy, _ := item.ValueCopy(nil)
-		//	fmt.Printf("The answer is: %s\n", valCopy)
-		//	return nil
-		//})
-
-		return nil
-	})
-}
-
 func main() {
 	readConfig()
 	h = setupHashIds()
 	store = stores.NewMongoStore()
-	//setupBadger()
 
 	// Echo instance
 	e := echo.New()
@@ -147,7 +86,7 @@ func main() {
 	e.Logger.Fatal(e.Start(viper.GetString("address")))
 }
 
-// Handler
+// Handlers
 func CreateLink(c echo.Context) error {
 	var body = new(struct {
 		Url string `json:"url"`
