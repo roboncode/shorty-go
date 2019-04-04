@@ -137,11 +137,11 @@ func main() {
 	}))
 
 	// Routes
-	e.POST("/shorten", ShortenUrl)
-	e.GET("/urls", GetUrls)
-	e.GET("/urls/newest", GetNewestCode)
-	e.GET("/urls/:code", GetCode)
-	e.DELETE("/urls/:code", DeleteCode)
+	e.POST("/shorten", CreateLink)
+	e.GET("/links", GetLinks)
+	e.GET("/links/newest", GetNewestLink)
+	e.GET("/links/:code", GetLink)
+	e.DELETE("/links/:code", DeleteLink)
 	e.File("/", "public/index.html")
 	e.File("/404", "public/404.html")
 	e.GET("/:code", RedirectToUrl)
@@ -152,7 +152,7 @@ func main() {
 }
 
 // Handler
-func ShortenUrl(c echo.Context) error {
+func CreateLink(c echo.Context) error {
 	var body = new(struct {
 		Url string `json:"url"`
 	})
@@ -191,7 +191,7 @@ func ShortenUrl(c echo.Context) error {
 
 }
 
-func GetUrls(c echo.Context) error {
+func GetLinks(c echo.Context) error {
 	// https://danott.co/posts/json-marshalling-empty-slices-to-empty-arrays-in-go.html
 	links := make([]Link, 0) // Do this to ensure empty array
 	collection := db.Collection(collectionName)
@@ -218,7 +218,7 @@ func GetUrls(c echo.Context) error {
 	return c.JSON(http.StatusOK, links)
 }
 
-func GetNewestCode(c echo.Context) error {
+func GetNewestLink(c echo.Context) error {
 	var link Link
 	collection := db.Collection(collectionName)
 	ctx, _ := context.WithTimeout(context.Background(), 5*time.Second)
@@ -234,7 +234,7 @@ func GetNewestCode(c echo.Context) error {
 	return c.JSON(http.StatusOK, link)
 }
 
-func GetCode(c echo.Context) error {
+func GetLink(c echo.Context) error {
 	var link Link
 	collection := db.Collection(collectionName)
 	ctx, _ := context.WithTimeout(context.Background(), 5*time.Second)
@@ -249,7 +249,7 @@ func GetCode(c echo.Context) error {
 	return c.JSON(http.StatusOK, link)
 }
 
-func DeleteCode(c echo.Context) error {
+func DeleteLink(c echo.Context) error {
 	collection := db.Collection(collectionName)
 	ctx, _ := context.WithTimeout(context.Background(), 5*time.Second)
 	_, _ = collection.DeleteOne(ctx, bson.M{
