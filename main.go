@@ -30,6 +30,7 @@ type Link struct {
 	Created  time.Time   `json:"created" bson:"created"`
 }
 
+var collectionName = "links"
 var db *mongo.Database
 var h *hashids.HashID
 
@@ -75,7 +76,7 @@ func readConfig() {
 	viper.SetDefault("hashMin", 5)
 	viper.SetDefault("address", ":1323")
 	viper.SetDefault("baseUrl", "")
-	viper.SetDefault("apiKey", "")
+	viper.SetDefault("authKey", "")
 	viper.SetConfigName("config")
 	viper.AddConfigPath(".")
 	err := viper.ReadInConfig() // Find and read the config file
@@ -96,7 +97,7 @@ func populateShortUrl(link *Link) {
 }
 
 func ensureIndexes() {
-	collection := db.Collection("links")
+	collection := db.Collection(collectionName)
 	_, err := collection.Indexes().CreateOne(
 		context.Background(),
 		mongo.IndexModel{
@@ -121,6 +122,19 @@ func main() {
 	// Middleware
 	e.Use(middleware.Logger())
 	e.Use(middleware.Recover())
+	e.Use(middleware.KeyAuthWithConfig(middleware.KeyAuthConfig{
+		KeyLookup: "query:key",
+		Skipper: func(e echo.Context) bool {
+			switch e.Path() {
+			case "/", "/404", "/:code", "/*":
+				return true
+			}
+			return false
+		},
+		Validator: func(key string, e echo.Context) (bool, error) {
+			return key == viper.GetString("authKey"), nil
+		},
+	}))
 
 	// Routes
 	e.POST("/shorten", ShortenUrl)
@@ -151,7 +165,7 @@ func ShortenUrl(c echo.Context) error {
 	}
 
 	var link Link
-	collection := db.Collection("links")
+	collection := db.Collection(collectionName)
 	ctx, _ := context.WithTimeout(context.Background(), 5*time.Second)
 	if err := collection.FindOne(ctx, bson.M{
 		"url": body.Url,
@@ -178,10 +192,9 @@ func ShortenUrl(c echo.Context) error {
 }
 
 func GetUrls(c echo.Context) error {
-	//var links []Link
 	// https://danott.co/posts/json-marshalling-empty-slices-to-empty-arrays-in-go.html
 	links := make([]Link, 0) // Do this to ensure empty array
-	collection := db.Collection("links")
+	collection := db.Collection(collectionName)
 	ctx, _ := context.WithTimeout(context.Background(), 5*time.Second)
 	skip, _ := strconv.ParseInt(c.QueryParam("s"), 10, 64)
 	limit, _ := strconv.ParseInt(c.QueryParam("l"), 10, 64)
@@ -207,7 +220,7 @@ func GetUrls(c echo.Context) error {
 
 func GetNewestCode(c echo.Context) error {
 	var link Link
-	collection := db.Collection("links")
+	collection := db.Collection(collectionName)
 	ctx, _ := context.WithTimeout(context.Background(), 5*time.Second)
 	err := collection.FindOne(ctx, bson.M{}, &options.FindOneOptions{
 		Sort: map[string]int{"created": -1},
@@ -223,7 +236,7 @@ func GetNewestCode(c echo.Context) error {
 
 func GetCode(c echo.Context) error {
 	var link Link
-	collection := db.Collection("links")
+	collection := db.Collection(collectionName)
 	ctx, _ := context.WithTimeout(context.Background(), 5*time.Second)
 	err := collection.FindOne(ctx, bson.M{
 		"code": c.Param("code"),
@@ -237,19 +250,17 @@ func GetCode(c echo.Context) error {
 }
 
 func DeleteCode(c echo.Context) error {
-	if viper.GetString("apiKey") == c.QueryParam("apikey") {
-		collection := db.Collection("links")
-		ctx, _ := context.WithTimeout(context.Background(), 5*time.Second)
-		_, _ = collection.DeleteOne(ctx, bson.M{
-			"code": c.Param("code"),
-		})
-	}
-	return c.JSON(http.StatusOK, nil)
+	collection := db.Collection(collectionName)
+	ctx, _ := context.WithTimeout(context.Background(), 5*time.Second)
+	_, _ = collection.DeleteOne(ctx, bson.M{
+		"code": c.Param("code"),
+	})
+	return c.NoContent(http.StatusOK)
 }
 
 func RedirectToUrl(c echo.Context) error {
 	var link Link
-	collection := db.Collection("links")
+	collection := db.Collection(collectionName)
 	ctx, _ := context.WithTimeout(context.Background(), 5*time.Second)
 	err := collection.FindOne(ctx, bson.M{
 		"code": c.Param("code"),

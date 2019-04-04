@@ -24,14 +24,19 @@ go run main.go
 The API is pretty simple.
 
 ```
+Authentication required - uri?key=:authKey
+
 POST    /shorten        body{ url:String }
 GET     /urls
-GET     /urls/newest   
+GET     /urls/newest 
 GET     /urls/:code
-DELETE  /urls/:code?apiKey=:apikey
-GET     /               Landing page
-GET     /:code          Redirect to long url
-GET     /*              404 page
+DELETE  /urls/:code
+
+No Authentication required
+
+GET     /                           Landing page
+GET     /:code                      Redirect to long url
+GET     /*                          404 page
 ```
 
 Feel free to fork and build on it. It works for my purposes.
