@@ -1,3 +1,4 @@
+store: "badger"
 address: ":1323"
 baseUrl: "https://ac.me"
 mongoUrl: "mongodb://localhost:27017"

@@ -2,9 +2,13 @@
 
 A simple URL shortener using Go and Mongo.
 
-This project was built using [Echo](https://echo.labstack.com/) and the official [Go MongoDb Driver](https://github.com/mongodb/mongo-go-driver). Since the app is pretty simple, <300 lines, it exists as a single file.
+This project was built using [Echo](https://echo.labstack.com/) and offers two data stores:
 
-## TLDR;
+* [Badger](https://github.com/dgraph-io/badger) - Embedded Go Key/Value Database for a simple standalone exec using 
+* [Mongo](https://github.com/mongodb/mongo-go-driver) - To handle multiple services such as in a Kubernetes environment
+
+
+## Develoment
 
 Use the Makefile to run docker
 
@@ -12,7 +16,7 @@ Use the Makefile to run docker
 make start
 ```
 
-Local development
+Local development using Badger
 
 ```
 make mongo

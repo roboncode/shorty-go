@@ -10,5 +10,7 @@ mongo:
 	docker-compose up -d db
 
 build:
-	docker build -t roboncode/shorturls .
+	docker build -t roboncode/urlshortener .
 
+standalone:
+	go build -o ./bin/urlshortener .

@@ -25,6 +25,7 @@ func setupHashIds() *hashids.HashID {
 }
 
 func readConfig() {
+	viper.SetDefault("store", "badger")
 	viper.SetDefault("mongoUrl", "mongodb://localhost:27017")
 	viper.SetDefault("database", "shorturls")
 	viper.SetDefault("hashSalt", "shorturls")
@@ -50,7 +51,18 @@ func readConfig() {
 func main() {
 	readConfig()
 	h = setupHashIds()
-	store = stores.NewMongoStore()
+	storeType := os.Getenv("STORE")
+	if storeType == "" {
+		storeType = viper.GetString("store")
+	}
+	switch storeType {
+	case "mongo":
+		store = stores.NewMongoStore()
+		log.Println("Using Mongo Database")
+	default:
+		store = stores.NewBadgerStore()
+		log.Println("Using Badger Database")
+	}
 
 	// Echo instance
 	e := echo.New()
@@ -100,7 +112,7 @@ func CreateLink(c echo.Context) error {
 		return c.JSON(http.StatusBadRequest, `Missing required property "url"`)
 	}
 
-	counter := store.IncCount()
+	counter := int(store.IncCount())
 	if code, err := h.Encode([]int{counter}); err != nil {
 		return c.JSON(http.StatusInternalServerError, err)
 	} else if link, err := store.Create(code, body.Url); err != nil {

@@ -2,13 +2,14 @@ version: '3.3'
 services:
 
   app:
-    image: "roboncode/shorturls"
+    image: "roboncode/urlshortener"
     tty: false
     restart: always
     ports:
       - 1323
     environment:
       - MONGO_DB=mongodb://mongo_urlshortener:27017
+      - STORE=mongo
     depends_on:
       - db
 

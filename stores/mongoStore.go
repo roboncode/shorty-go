@@ -56,7 +56,7 @@ func (m *MongoStore) formatShortUrl(link *models.Link) {
 	link.ShortUrl = viper.GetString("baseUrl") + "/" + link.Code
 }
 
-func (m *MongoStore) IncCount() int {
+func (m *MongoStore) IncCount() int64 {
 	var counter models.Counter
 	collection := m.db.Collection("counter")
 	ctx, _ := context.WithTimeout(context.Background(), 5*time.Second)
