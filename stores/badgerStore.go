@@ -4,8 +4,8 @@ import (
 	"crypto/md5"
 	"encoding/hex"
 	"github.com/dgraph-io/badger"
+	"github.com/roboncode/go-urlshortener/models"
 	"os"
-	"roboncode.com/go-urlshortener/models"
 	"time"
 )
 

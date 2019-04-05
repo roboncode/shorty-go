@@ -4,12 +4,12 @@ import (
 	"github.com/labstack/echo"
 	"github.com/labstack/echo/middleware"
 	"github.com/labstack/gommon/color"
+	"github.com/roboncode/go-urlshortener/stores"
 	"github.com/speps/go-hashids"
 	"github.com/spf13/viper"
 	"log"
 	"net/http"
 	"os"
-	"roboncode.com/go-urlshortener/stores"
 	"strconv"
 )
 
@@ -68,7 +68,9 @@ func main() {
 	e := echo.New()
 
 	// Middleware
-	e.Use(middleware.Logger())
+	if os.Getenv("ENV") != "prod" {
+		e.Use(middleware.Logger())
+	}
 	e.Use(middleware.Recover())
 	e.Use(middleware.KeyAuthWithConfig(middleware.KeyAuthConfig{
 		KeyLookup: "query:key",

@@ -3,13 +3,13 @@ package stores
 import (
 	"context"
 	"github.com/labstack/gommon/color"
+	"github.com/roboncode/go-urlshortener/models"
 	"github.com/spf13/viper"
 	"go.mongodb.org/mongo-driver/bson"
 	"go.mongodb.org/mongo-driver/mongo"
 	"go.mongodb.org/mongo-driver/mongo/options"
 	"go.mongodb.org/mongo-driver/x/bsonx"
 	"log"
-	"roboncode.com/go-urlshortener/models"
 	"time"
 )
 

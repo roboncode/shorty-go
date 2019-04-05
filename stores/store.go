@@ -1,6 +1,6 @@
 package stores
 
-import "roboncode.com/go-urlshortener/models"
+import "github.com/roboncode/go-urlshortener/models"
 
 type Store interface {
 	IncCount() int64
