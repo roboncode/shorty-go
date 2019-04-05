@@ -1,5 +1,5 @@
 store: "badger"
-address: ":1323"
+address: ":8080"
 baseUrl: "https://ac.me"
 mongoUrl: "mongodb://localhost:27017"
 database: "shorturls"

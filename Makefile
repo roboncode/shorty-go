@@ -14,3 +14,6 @@ build:
 
 standalone:
 	go build -o ./bin/urlshortener .
+
+run:
+	./bin/urlshortener

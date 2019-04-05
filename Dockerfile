@@ -25,5 +25,5 @@ COPY --from=builder /go/src/github.com/roboncode/go-urlshortener/app .
 COPY --from=builder /go/src/github.com/roboncode/go-urlshortener/config.* .
 COPY --from=builder /go/src/github.com/roboncode/go-urlshortener/public ./public
 
-EXPOSE 1323
+EXPOSE 8080
 ENTRYPOINT ["./app"]
