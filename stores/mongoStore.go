@@ -3,6 +3,7 @@ package stores
 import (
 	"context"
 	"github.com/labstack/gommon/color"
+	"github.com/patrickmn/go-cache"
 	"github.com/roboncode/go-urlshortener/models"
 	"github.com/spf13/viper"
 	"go.mongodb.org/mongo-driver/bson"
@@ -17,12 +18,16 @@ var collectionName = "links"
 
 type MongoStore struct {
 	db *mongo.Database
+	c  *cache.Cache
 }
 
 func NewMongoStore() *MongoStore {
 	m := MongoStore{}
 	m.db = m.connect()
 	m.ensureIndexes()
+
+	m.c = cache.New(viper.GetDuration("cacheExpMin")*time.Minute, viper.GetDuration("cacheCleanupMin")*time.Minute)
+
 	return &m
 }
 
@@ -33,7 +38,7 @@ func (m *MongoStore) connect() *mongo.Database {
 	if err != nil {
 		log.Fatal(err)
 	}
-	log.Println(color.Green("Successfully connected to database"))
+	log.Println(color.Blue("Connecting to Mongo database"))
 	dbName := viper.GetString("database")
 	return client.Database(dbName)
 }
@@ -94,17 +99,26 @@ func (m *MongoStore) Create(code string, longUrl string) (*models.Link, error) {
 }
 
 func (m *MongoStore) Read(code string) (*models.Link, error) {
-	var link models.Link
-	collection := m.db.Collection(collectionName)
-	ctx, _ := context.WithTimeout(context.Background(), 5*time.Second)
-	err := collection.FindOne(ctx, bson.M{
-		"code": code,
-	}).Decode(&link)
-	if err != nil {
-		return nil, err
+	var link *models.Link
+	var err error
+	cachedItem, found := m.c.Get(code)
+	if found {
+		link = cachedItem.(*models.Link)
+	} else {
+		collection := m.db.Collection(collectionName)
+		ctx, _ := context.WithTimeout(context.Background(), 5*time.Second)
+		err = collection.FindOne(ctx, bson.M{
+			"code": code,
+		}).Decode(&link)
+		if err != nil {
+			return nil, err
+		}
 	}
-	m.formatShortUrl(&link)
-	return &link, nil
+	if link != nil {
+		m.c.Set(code, link, cache.DefaultExpiration)
+		m.formatShortUrl(link)
+	}
+	return link, nil
 }
 
 func (m *MongoStore) Delete(code string) int64 {
@@ -113,6 +127,7 @@ func (m *MongoStore) Delete(code string) int64 {
 	result, _ := collection.DeleteOne(ctx, bson.M{
 		"code": code,
 	})
+	m.c.Delete(code)
 	return result.DeletedCount
 }
 

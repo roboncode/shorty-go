@@ -7,6 +7,8 @@ This project was built using [Echo](https://echo.labstack.com/) and offers two d
 * [Badger](https://github.com/dgraph-io/badger) - Embedded Go Key/Value Database for a simple standalone exec using 
 * [Mongo](https://github.com/mongodb/mongo-go-driver) - To handle clustered services such as in a Kubernetes environment
 
+The Mongo database uses [go-cache](github.com/patrickmn/go-cache) to ttl cache to prevent burdening the database with redundant requests.  
+
 ## Running as Docker container
 
 ```

@@ -170,6 +170,14 @@
   revision = "138eaf8dc34d1c265aab931e3541149d667426ca"
 
 [[projects]]
+  digest = "1:808cdddf087fb64baeae67b8dfaee2069034d9704923a3cb8bd96a995421a625"
+  name = "github.com/patrickmn/go-cache"
+  packages = ["."]
+  pruneopts = "UT"
+  revision = "a3647f8e31d79543b2d0f0ae2fe5c379d72cedc0"
+  version = "v2.1.0"
+
+[[projects]]
   digest = "1:e0f50a07c0def90588d69f77178712c6fdc67eb6576365f551cce98b44b501bf"
   name = "github.com/pelletier/go-toml"
   packages = ["."]
@@ -395,6 +403,7 @@
     "github.com/labstack/echo",
     "github.com/labstack/echo/middleware",
     "github.com/labstack/gommon/color",
+    "github.com/patrickmn/go-cache",
     "github.com/speps/go-hashids",
     "github.com/spf13/viper",
     "go.mongodb.org/mongo-driver/bson",

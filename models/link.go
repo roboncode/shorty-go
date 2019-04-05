@@ -21,8 +21,8 @@ func (link Link) EncodeLink() []byte {
 	return data
 }
 
-func DecodeLink(data []byte) (Link, error) {
+func DecodeLink(data []byte) (*Link, error) {
 	var link Link
 	err := json.Unmarshal(data, &link)
-	return link, err
+	return &link, err
 }

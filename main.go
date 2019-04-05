@@ -33,6 +33,8 @@ func readConfig() {
 	viper.SetDefault("address", ":1323")
 	viper.SetDefault("baseUrl", "")
 	viper.SetDefault("authKey", "")
+	viper.SetDefault("cacheExpMin", 15)
+	viper.SetDefault("cacheCleanupMin", 60)
 	viper.SetConfigName("config")
 	viper.AddConfigPath(".")
 	err := viper.ReadInConfig() // Find and read the config file
@@ -58,10 +60,10 @@ func main() {
 	switch storeType {
 	case "mongo":
 		store = stores.NewMongoStore()
-		log.Println("Using Mongo Database")
+		log.Println(color.Green("Connected Mongo database"))
 	default:
 		store = stores.NewBadgerStore()
-		log.Println("Using Badger Database")
+		log.Println(color.Green("Connected Badger database"))
 	}
 
 	// Echo instance

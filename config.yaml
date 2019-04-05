@@ -1,4 +1,4 @@
-store: "badger"
+store: "mongo"
 address: ":8080"
 baseUrl: "https://ac.me"
 mongoUrl: "mongodb://localhost:27017"

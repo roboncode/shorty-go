@@ -61,7 +61,7 @@ func (b *BadgerStore) restoreCounter() {
 }
 
 func (b *BadgerStore) FindLink(hashedLongUrl string) *models.Link {
-	var link models.Link
+	var link *models.Link
 	var err error
 
 	err = b.db.View(func(txn *badger.Txn) error {
@@ -87,7 +87,7 @@ func (b *BadgerStore) FindLink(hashedLongUrl string) *models.Link {
 	if err != nil {
 		return nil
 	}
-	return &link
+	return link
 }
 
 func (b *BadgerStore) IncCount() int64 {
@@ -128,7 +128,7 @@ func (b *BadgerStore) Create(code string, longUrl string) (*models.Link, error) 
 }
 
 func (b *BadgerStore) Read(code string) (*models.Link, error) {
-	var link models.Link
+	var link *models.Link
 	var err error
 
 	err = b.db.View(func(txn *badger.Txn) error {
@@ -154,11 +154,11 @@ func (b *BadgerStore) Read(code string) (*models.Link, error) {
 	if err != nil {
 		return nil, err
 	}
-	return &link, nil
+	return link, nil
 }
 
 func (b *BadgerStore) List(limit int64, skip int64) []models.Link {
-	return nil
+	return make([]models.Link, 0)
 }
 
 func (b *BadgerStore) Delete(code string) int64 {
