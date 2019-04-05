@@ -5,21 +5,30 @@ A simple URL shortener using Go and Mongo.
 This project was built using [Echo](https://echo.labstack.com/) and offers two data stores:
 
 * [Badger](https://github.com/dgraph-io/badger) - Embedded Go Key/Value Database for a simple standalone exec using 
-* [Mongo](https://github.com/mongodb/mongo-go-driver) - To handle multiple services such as in a Kubernetes environment
+* [Mongo](https://github.com/mongodb/mongo-go-driver) - To handle clustered services such as in a Kubernetes environment
 
-
-## Develoment
-
-Use the Makefile to run docker
+## Running as Docker container
 
 ```
+make build
 make start
 ```
 
-Local development using Badger
+Service will be available on http://localhost:8080
+
+
+## Running standalone executable
 
 ```
-make mongo
+make standalone
+make run
+```
+
+Service will be available on http://localhost:8080
+
+## Running local
+
+```
 go run main.go
 ```
 
@@ -30,9 +39,8 @@ The API is pretty simple.
 ```
 Authentication required - uri?key=:authKey
 
-POST    /shorten        body{ url:String }
-GET     /links?l=:limit&s=:skip
-GET     /links/newest 
+POST    /shorten                    body{ url:String }
+GET     /links?l=:limit&s=:skip     *Mongo only
 GET     /links/:code
 DELETE  /links/:code
 
