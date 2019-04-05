@@ -4,8 +4,8 @@
 FROM golang:1.12.1 AS builder
 RUN go version
 
-COPY . /go/src/shorturls/
-WORKDIR /go/src/shorturls/
+COPY . /go/src/github.com/roboncode/go-urlshortener
+WORKDIR /go/src/github.com/roboncode/go-urlshortener/
 RUN set -x && \
     go get github.com/golang/dep/cmd/dep && \
     dep ensure -v
@@ -21,9 +21,9 @@ RUN CGO_ENABLED=0 GOOS=linux GOARCH=amd64 go build -a -o app .
 #
 FROM scratch
 WORKDIR /root/
-COPY --from=builder /go/src/shorturls/app .
-COPY --from=builder /go/src/shorturls/config.* .
-COPY --from=builder /go/src/shorturls/public ./public
+COPY --from=builder /go/src/github.com/roboncode/go-urlshortener/app .
+COPY --from=builder /go/src/github.com/roboncode/go-urlshortener/config.* .
+COPY --from=builder /go/src/github.com/roboncode/go-urlshortener/public ./public
 
 EXPOSE 1323
 ENTRYPOINT ["./app"]

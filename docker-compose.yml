@@ -6,8 +6,9 @@ services:
     tty: false
     restart: always
     ports:
-      - 1323
+      - 8080:1323
     environment:
+      - ENV=prod
       - MONGO_DB=mongodb://mongo_urlshortener:27017
       - STORE=mongo
     depends_on:
