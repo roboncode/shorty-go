@@ -1,8 +1,6 @@
 package stores
 
 import (
-	"crypto/md5"
-	"encoding/hex"
 	"github.com/dgraph-io/badger"
 	"github.com/roboncode/go-urlshortener/helpers"
 	"github.com/roboncode/go-urlshortener/models"
@@ -26,12 +24,6 @@ func NewBadgerStore() *BadgerStore {
 	b.db = b.connect()
 	b.restoreCounter()
 	return &b
-}
-
-func GetMD5Hash(text string) string {
-	hasher := md5.New()
-	hasher.Write([]byte(text))
-	return hex.EncodeToString(hasher.Sum(nil))
 }
 
 func (b *BadgerStore) connect() *badger.DB {
@@ -107,7 +99,7 @@ func (b *BadgerStore) IncCount() int64 {
 
 func (b *BadgerStore) Create(code string, longUrl string) (*models.Link, error) {
 	var err error
-	hashedLongUrl := GetMD5Hash(longUrl)
+	hashedLongUrl := helpers.MD5(longUrl)
 	link := b.FindLink(hashedLongUrl)
 	if link != nil {
 		helpers.FormatShortUrl(link)
@@ -176,7 +168,7 @@ func (b *BadgerStore) Delete(code string) int64 {
 	var err error
 	if link != nil {
 		err = b.db.Update(func(txn *badger.Txn) error {
-			hashedLongUrl := GetMD5Hash(link.LongUrl)
+			hashedLongUrl := helpers.MD5(link.LongUrl)
 			err = txn.Delete([]byte(code))
 			err = txn.Delete([]byte(hashedLongUrl))
 			return err

@@ -17,3 +17,6 @@ standalone:
 
 run:
 	./bin/urlshortener
+
+test:
+	go test ./...

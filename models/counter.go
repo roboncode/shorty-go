@@ -6,7 +6,7 @@ type Counter struct {
 	Value int64 `json:"value" bson:"value"`
 }
 
-func (c Counter) EncodeCounter() []byte {
+func (c *Counter) EncodeCounter() []byte {
 	data, err := json.Marshal(c)
 	if err != nil {
 		panic(err)

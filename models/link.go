@@ -13,7 +13,7 @@ type Link struct {
 	Created  time.Time   `json:"created" bson:"created"`
 }
 
-func (link Link) EncodeLink() []byte {
+func (link *Link) EncodeLink() []byte {
 	data, err := json.Marshal(link)
 	if err != nil {
 		panic(err)
