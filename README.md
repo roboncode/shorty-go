@@ -60,7 +60,7 @@ configurable variables. You can also override any variables as environment varia
 in the docker-compose.yml. You can also set the variables from the command line.
 
 ```
-STORE=mongo ./bin/urlshortener
+ENV=prod STORE=mongo ./bin/urlshortener
 ```
 
 Feel free to fork it, hack it and use it any way you please.
