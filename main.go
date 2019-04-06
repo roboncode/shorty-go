@@ -4,6 +4,7 @@ import (
 	"github.com/labstack/echo"
 	"github.com/labstack/echo/middleware"
 	"github.com/labstack/gommon/color"
+	c "github.com/roboncode/go-urlshortener/consts"
 	"github.com/roboncode/go-urlshortener/stores"
 	"github.com/speps/go-hashids"
 	"github.com/spf13/viper"
@@ -13,64 +14,63 @@ import (
 	"strconv"
 )
 
+// :: Internal ::
+const ConnectedMongoMsg = "Connected Mongo database"
+const ConnectedBadgerMsg = "Connected Badger database"
+const NoConfigMsg = "No config file found. Using default settings"
+const MissingRequiredUrlMsg = `Missing required property "url"`
+
 var store stores.Store
 var h *hashids.HashID
 
 func setupHashIds() *hashids.HashID {
 	hd := hashids.NewData()
-	hd.Salt = viper.GetString("hashSalt")
-	hd.MinLength = viper.GetInt("hashMin")
+	hd.Salt = viper.GetString(c.HashSalt)
+	hd.MinLength = viper.GetInt(c.HashMin)
 	h, _ := hashids.NewWithData(hd)
 	return h
 }
 
 func readConfig() {
-	viper.SetDefault("store", "badger")
-	viper.SetDefault("mongoUrl", "mongodb://localhost:27017")
-	viper.SetDefault("database", "shorturls")
-	viper.SetDefault("hashSalt", "shorturls")
-	viper.SetDefault("hashMin", 5)
-	viper.SetDefault("address", ":1323")
-	viper.SetDefault("baseUrl", "")
-	viper.SetDefault("authKey", "")
-	viper.SetDefault("cacheExpMin", 15)
-	viper.SetDefault("cacheCleanupMin", 60)
+	_ = viper.BindEnv(c.AuthKey)
+	_ = viper.BindEnv(c.BaseUrl)
+	_ = viper.BindEnv(c.Env)
+	_ = viper.BindEnv(c.HashMin)
+	_ = viper.BindEnv(c.HashSalt)
+	_ = viper.BindEnv(c.ServerAddr)
+	_ = viper.BindEnv(c.Store)
+
+	viper.SetDefault(c.AuthKey, "")
+	viper.SetDefault(c.BaseUrl, "")
+	viper.SetDefault(c.ServerAddr, ":8080")
+	viper.SetDefault(c.Store, "badger")
+	viper.SetDefault(c.HashSalt, "$h0rtur1$")
+	viper.SetDefault(c.HashMin, 5)
 	viper.SetConfigName("config")
 	viper.AddConfigPath(".")
 	err := viper.ReadInConfig() // Find and read the config file
 	if err != nil {
-		log.Println(color.Red("No config file found. Using default settings"))
-	} else {
-		log.Println(color.Green("Config found -- overriding defaults"))
-	}
-
-	mongoUrl := os.Getenv("MONGO_DB")
-	if mongoUrl != "" {
-		viper.Set("mongoUrl", mongoUrl)
+		log.Println(color.Red(NoConfigMsg))
 	}
 }
 
 func main() {
 	readConfig()
 	h = setupHashIds()
-	storeType := os.Getenv("STORE")
-	if storeType == "" {
-		storeType = viper.GetString("store")
-	}
-	switch storeType {
+	switch viper.GetString(c.Store) {
 	case "mongo":
 		store = stores.NewMongoStore()
-		log.Println(color.Green("Connected Mongo database"))
+		log.Println(color.Green(ConnectedMongoMsg))
 	default:
 		store = stores.NewBadgerStore()
-		log.Println(color.Green("Connected Badger database"))
+		log.Println(color.Green(ConnectedBadgerMsg))
 	}
 
 	// Echo instance
 	e := echo.New()
 
 	// Middleware
-	if os.Getenv("ENV") != "prod" {
+	if os.Getenv(c.Env) != "prod" {
 		e.Use(middleware.Logger())
 	}
 	e.Use(middleware.Recover())
@@ -84,7 +84,7 @@ func main() {
 			return false
 		},
 		Validator: func(key string, e echo.Context) (bool, error) {
-			return key == viper.GetString("authKey"), nil
+			return key == viper.GetString(c.AuthKey), nil
 		},
 	}))
 
@@ -99,7 +99,7 @@ func main() {
 	e.File("/*", "public/404.html")
 
 	// Start server
-	e.Logger.Fatal(e.Start(viper.GetString("address")))
+	e.Logger.Fatal(e.Start(viper.GetString(c.ServerAddr)))
 }
 
 // Handlers
@@ -113,7 +113,7 @@ func CreateLink(c echo.Context) error {
 	}
 
 	if body.Url == "" {
-		return c.JSON(http.StatusBadRequest, `Missing required property "url"`)
+		return c.JSON(http.StatusBadRequest, MissingRequiredUrlMsg)
 	}
 
 	counter := int(store.IncCount())

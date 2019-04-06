@@ -4,10 +4,14 @@ import (
 	"crypto/md5"
 	"encoding/hex"
 	"github.com/dgraph-io/badger"
+	"github.com/roboncode/go-urlshortener/helpers"
 	"github.com/roboncode/go-urlshortener/models"
+	"github.com/spf13/viper"
 	"os"
 	"time"
 )
+
+const BadgerDir = "BADGER_DIR"
 
 type BadgerStore struct {
 	db      *badger.DB
@@ -15,6 +19,9 @@ type BadgerStore struct {
 }
 
 func NewBadgerStore() *BadgerStore {
+	viper.SetDefault(BadgerDir, "./data/badger")
+	_ = viper.BindEnv(BadgerDir)
+
 	b := BadgerStore{}
 	b.db = b.connect()
 	b.restoreCounter()
@@ -28,7 +35,7 @@ func GetMD5Hash(text string) string {
 }
 
 func (b *BadgerStore) connect() *badger.DB {
-	dir := "./data/badger"
+	dir := viper.GetString(BadgerDir)
 	_ = os.MkdirAll(dir, os.ModePerm)
 
 	opts := badger.DefaultOptions
@@ -103,6 +110,7 @@ func (b *BadgerStore) Create(code string, longUrl string) (*models.Link, error) 
 	hashedLongUrl := GetMD5Hash(longUrl)
 	link := b.FindLink(hashedLongUrl)
 	if link != nil {
+		helpers.FormatShortUrl(link)
 		return link, err
 	}
 
@@ -124,6 +132,7 @@ func (b *BadgerStore) Create(code string, longUrl string) (*models.Link, error) 
 		return nil, err
 	}
 
+	helpers.FormatShortUrl(&newLink)
 	return &newLink, nil
 }
 
@@ -154,6 +163,7 @@ func (b *BadgerStore) Read(code string) (*models.Link, error) {
 	if err != nil {
 		return nil, err
 	}
+	helpers.FormatShortUrl(link)
 	return link, nil
 }
 

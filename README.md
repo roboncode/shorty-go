@@ -53,6 +53,16 @@ GET     /:code          Redirect to long url
 GET     /*              404 page
 ```
 
+## Config and Env variables
+
+This service uses [Viper](https://github.com/spf13/viper) for it's configuration. The config.yaml contains all the 
+configurable variables. You can also override any variables as environment variables. You will see examples of this
+in the docker-compose.yml. You can also set the variables from the command line.
+
+```
+STORE=mongo ./bin/urlshortener
+```
+
 Feel free to fork it, hack it and use it any way you please.
 
 **MIT License**
