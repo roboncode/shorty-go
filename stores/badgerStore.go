@@ -91,7 +91,7 @@ func (b *BadgerStore) FindLink(hashedLongUrl string) *models.Link {
 	return link
 }
 
-func (b *BadgerStore) IncCount() int64 {
+func (b *BadgerStore) IncCount() int {
 	b.counter.Value++
 	_ = b.db.Update(func(txn *badger.Txn) error {
 		return txn.Set([]byte("counter"), b.counter.EncodeCounter())
@@ -161,11 +161,11 @@ func (b *BadgerStore) Read(code string) (*models.Link, error) {
 	return link, nil
 }
 
-func (b *BadgerStore) List(limit int64, skip int64) []models.Link {
+func (b *BadgerStore) List(limit int, skip int) []models.Link {
 	return make([]models.Link, 0)
 }
 
-func (b *BadgerStore) Delete(code string) int64 {
+func (b *BadgerStore) Delete(code string) int {
 	link, _ := b.Read(code)
 	var err error
 	if link != nil {

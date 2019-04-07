@@ -34,39 +34,39 @@ func (_m *Store) Create(code string, url string) (*models.Link, error) {
 }
 
 // Delete provides a mock function with given fields: code
-func (_m *Store) Delete(code string) int64 {
+func (_m *Store) Delete(code string) int {
 	ret := _m.Called(code)
 
-	var r0 int64
-	if rf, ok := ret.Get(0).(func(string) int64); ok {
+	var r0 int
+	if rf, ok := ret.Get(0).(func(string) int); ok {
 		r0 = rf(code)
 	} else {
-		r0 = ret.Get(0).(int64)
+		r0 = ret.Get(0).(int)
 	}
 
 	return r0
 }
 
 // IncCount provides a mock function with given fields:
-func (_m *Store) IncCount() int64 {
+func (_m *Store) IncCount() int {
 	ret := _m.Called()
 
-	var r0 int64
-	if rf, ok := ret.Get(0).(func() int64); ok {
+	var r0 int
+	if rf, ok := ret.Get(0).(func() int); ok {
 		r0 = rf()
 	} else {
-		r0 = ret.Get(0).(int64)
+		r0 = ret.Get(0).(int)
 	}
 
 	return r0
 }
 
 // List provides a mock function with given fields: limit, skip
-func (_m *Store) List(limit int64, skip int64) []models.Link {
+func (_m *Store) List(limit int, skip int) []models.Link {
 	ret := _m.Called(limit, skip)
 
 	var r0 []models.Link
-	if rf, ok := ret.Get(0).(func(int64, int64) []models.Link); ok {
+	if rf, ok := ret.Get(0).(func(int, int) []models.Link); ok {
 		r0 = rf(limit, skip)
 	} else {
 		if ret.Get(0) != nil {

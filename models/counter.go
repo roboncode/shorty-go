@@ -3,7 +3,7 @@ package models
 import "encoding/json"
 
 type Counter struct {
-	Value int64 `json:"value" bson:"value"`
+	Value int `json:"value" bson:"value"`
 }
 
 func (c *Counter) EncodeCounter() []byte {

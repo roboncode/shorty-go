@@ -48,7 +48,7 @@ func TestHandler_CreateLink(t *testing.T) {
 	firstMockDB := mockDB[1]
 
 	mockStore := mocks.Store{}
-	mockStore.On("IncCount").Return(int64(ID))
+	mockStore.On("IncCount").Return(ID)
 	mockStore.On("Create", "lejRe", "https://roboncode.com").Return(&firstMockDB, nil)
 
 	h := &Handler{
@@ -101,8 +101,8 @@ func TestHandler_GetLinks(t *testing.T) {
 	c.SetPath("/links")
 
 	links := []models.Link{mockDB[1], mockDB[2]}
-	limit := int64(0)
-	skip := int64(0)
+	limit := 0
+	skip := 0
 
 	mockStore := mocks.Store{}
 	mockStore.On("List", limit, skip).Return(links)
@@ -132,11 +132,8 @@ func TestHandler_DeleteLink(t *testing.T) {
 	c.SetParamNames("code")
 	c.SetParamValues("abc")
 
-	//firstMockDB := mockDB[1]
-
 	mockStore := mocks.Store{}
-	//mockStore.On("Read", c.Param("code")).Return(&firstMockDB, nil)
-	mockStore.On("Delete", c.Param("code")).Return(int64(1))
+	mockStore.On("Delete", c.Param("code")).Return(1)
 
 	h := &Handler{
 		Store:  &mockStore,

@@ -16,5 +16,5 @@ func TestDecodeCounter(t *testing.T) {
 	counter := Counter{1}
 	encoded := counter.EncodeCounter()
 	decoded, _ := DecodeCounter(encoded)
-	assert.Equal(t, decoded.Value, int64(1), "DecodeCounter failed to match")
+	assert.Equal(t, decoded.Value, 1, "DecodeCounter failed to match")
 }

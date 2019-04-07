@@ -83,7 +83,7 @@ func (m *MongoStore) ensureIndexes() {
 	}
 }
 
-func (m *MongoStore) IncCount() int64 {
+func (m *MongoStore) IncCount() int {
 	var counter models.Counter
 	collection := m.db.Collection(MongoCounterCollection)
 	ctx, _ := context.WithTimeout(context.Background(), 5*time.Second)
@@ -143,24 +143,26 @@ func (m *MongoStore) Read(code string) (*models.Link, error) {
 	return link, nil
 }
 
-func (m *MongoStore) Delete(code string) int64 {
+func (m *MongoStore) Delete(code string) int {
 	collection := m.db.Collection(MongoLinksCollection)
 	ctx, _ := context.WithTimeout(context.Background(), 5*time.Second)
 	result, _ := collection.DeleteOne(ctx, bson.M{
 		"code": code,
 	})
 	m.c.Delete(code)
-	return result.DeletedCount
+	return int(result.DeletedCount)
 }
 
-func (m *MongoStore) List(limit int64, skip int64) []models.Link {
+func (m *MongoStore) List(limit int, skip int) []models.Link {
 	// https://danott.co/posts/json-marshalling-empty-slices-to-empty-arrays-in-go.html
 	links := make([]models.Link, 0) // Do this to ensure empty array
 	collection := m.db.Collection(MongoLinksCollection)
 	ctx, _ := context.WithTimeout(context.Background(), 5*time.Second)
+	l := int64(limit)
+	s := int64(skip)
 	cursor, err := collection.Find(ctx, bson.M{}, &options.FindOptions{
-		Skip:  &skip,
-		Limit: &limit,
+		Limit: &l,
+		Skip:  &s,
 	})
 
 	defer cursor.Close(ctx)
