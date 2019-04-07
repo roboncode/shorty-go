@@ -15,23 +15,25 @@ import (
 	"time"
 )
 
-// :: Config ::
-const MongoCacheCleanup = "MONGO_CACHE_CLEANUP"
-const MongoCacheExp = "MONGO_CACHE_EXP"
-const MongoCounterCollection = "MONGO_COL_COUNTER"
-const MongoLinksCollection = "MONGO_COL_LINKS"
-const MongoUrl = "MONGO_URL"
-const MongoDb = "MONGO_DB"
+const (
+	// :: Config ::
+	MongoCacheCleanup      = "MONGO_CACHE_CLEANUP"
+	MongoCacheExp          = "MONGO_CACHE_EXP"
+	MongoCounterCollection = "MONGO_COL_COUNTER"
+	MongoLinksCollection   = "MONGO_COL_LINKS"
+	MongoUrl               = "MONGO_URL"
+	MongoDb                = "MONGO_DB"
 
-// :: Internal ::
-const ConnectingMsg = "Connecting to Mongo database"
+	// :: Internal ::
+	ConnectingMsg = "Connecting to Mongo database"
+)
 
 type MongoStore struct {
 	db *mongo.Database
 	c  *cache.Cache
 }
 
-func NewMongoStore() *MongoStore {
+func NewMongoStore() Store {
 	viper.SetDefault(MongoCacheCleanup, 60)
 	viper.SetDefault(MongoCacheExp, 15)
 	viper.SetDefault(MongoCounterCollection, "counter")
@@ -114,7 +116,7 @@ func (m *MongoStore) Create(code string, longUrl string) (*models.Link, error) {
 		}
 		link.ID = res.InsertedID
 	}
-	helpers.FormatShortUrl(&link)
+	link.ShortUrl = helpers.GetShortUrl(link.Code)
 	return &link, nil
 }
 
@@ -136,7 +138,7 @@ func (m *MongoStore) Read(code string) (*models.Link, error) {
 	}
 	if link != nil {
 		m.c.Set(code, link, cache.DefaultExpiration)
-		helpers.FormatShortUrl(link)
+		link.ShortUrl = helpers.GetShortUrl(link.Code)
 	}
 	return link, nil
 }
@@ -167,7 +169,7 @@ func (m *MongoStore) List(limit int64, skip int64) []models.Link {
 		for cursor.Next(ctx) {
 			var link models.Link
 			_ = cursor.Decode(&link)
-			helpers.FormatShortUrl(&link)
+			link.ShortUrl = helpers.GetShortUrl(link.Code)
 			links = append(links, link)
 		}
 	}

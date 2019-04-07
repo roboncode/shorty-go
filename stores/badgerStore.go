@@ -9,14 +9,16 @@ import (
 	"time"
 )
 
-const BadgerDir = "BADGER_DIR"
+const (
+	BadgerDir = "BADGER_DIR"
+)
 
 type BadgerStore struct {
 	db      *badger.DB
 	counter models.Counter
 }
 
-func NewBadgerStore() *BadgerStore {
+func NewBadgerStore() Store {
 	viper.SetDefault(BadgerDir, "./data/badger")
 	_ = viper.BindEnv(BadgerDir)
 
@@ -102,7 +104,7 @@ func (b *BadgerStore) Create(code string, longUrl string) (*models.Link, error) 
 	hashedLongUrl := helpers.MD5(longUrl)
 	link := b.FindLink(hashedLongUrl)
 	if link != nil {
-		helpers.FormatShortUrl(link)
+		link.ShortUrl = helpers.GetShortUrl(link.Code)
 		return link, err
 	}
 
@@ -124,7 +126,7 @@ func (b *BadgerStore) Create(code string, longUrl string) (*models.Link, error) 
 		return nil, err
 	}
 
-	helpers.FormatShortUrl(&newLink)
+	newLink.ShortUrl = helpers.GetShortUrl(newLink.Code)
 	return &newLink, nil
 }
 
@@ -155,7 +157,7 @@ func (b *BadgerStore) Read(code string) (*models.Link, error) {
 	if err != nil {
 		return nil, err
 	}
-	helpers.FormatShortUrl(link)
+	link.ShortUrl = helpers.GetShortUrl(link.Code)
 	return link, nil
 }
 

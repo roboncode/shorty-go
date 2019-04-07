@@ -5,33 +5,22 @@ import (
 	"github.com/labstack/echo/middleware"
 	"github.com/labstack/gommon/color"
 	c "github.com/roboncode/go-urlshortener/consts"
+	"github.com/roboncode/go-urlshortener/handlers"
+	"github.com/roboncode/go-urlshortener/helpers"
 	"github.com/roboncode/go-urlshortener/stores"
-	"github.com/speps/go-hashids"
 	"github.com/spf13/viper"
 	"log"
-	"net/http"
 	"os"
-	"strconv"
 )
 
-// :: Internal ::
-const ConnectedMongoMsg = "Connected Mongo database"
-const ConnectedBadgerMsg = "Connected Badger database"
-const NoConfigMsg = "No config file found. Using default settings"
-const MissingRequiredUrlMsg = `Missing required property "url"`
+const (
+	// :: Internal ::
+	NoConfigMsg        = "No config file found. Using default settings"
+	ConnectedMongoMsg  = "Connected Mongo database"
+	ConnectedBadgerMsg = "Connected Badger database"
+)
 
-var store stores.Store
-var h *hashids.HashID
-
-func setupHashIds() *hashids.HashID {
-	hd := hashids.NewData()
-	hd.Salt = viper.GetString(c.HashSalt)
-	hd.MinLength = viper.GetInt(c.HashMin)
-	h, _ := hashids.NewWithData(hd)
-	return h
-}
-
-func readConfig() {
+func initConfig() {
 	_ = viper.BindEnv(c.AuthKey)
 	_ = viper.BindEnv(c.BaseUrl)
 	_ = viper.BindEnv(c.Env)
@@ -54,10 +43,9 @@ func readConfig() {
 	}
 }
 
-func main() {
-	readConfig()
-	h = setupHashIds()
-	switch viper.GetString(c.Store) {
+func NewStore(storeType string) stores.Store {
+	var store stores.Store
+	switch storeType {
 	case "mongo":
 		store = stores.NewMongoStore()
 		log.Println(color.Green(ConnectedMongoMsg))
@@ -65,9 +53,22 @@ func main() {
 		store = stores.NewBadgerStore()
 		log.Println(color.Green(ConnectedBadgerMsg))
 	}
+	return store
+}
+
+func main() {
+	initConfig()
 
 	// Echo instance
 	e := echo.New()
+
+	store := NewStore(viper.GetString(c.Store))
+	hashID := helpers.NewHashID()
+
+	h := handlers.Handler{
+		Store:  store,
+		HashID: hashID,
+	}
 
 	// Middleware
 	if os.Getenv(c.Env) != "prod" {
@@ -89,70 +90,15 @@ func main() {
 	}))
 
 	// Routes
-	e.POST("/shorten", CreateLink)
-	e.GET("/links", GetLinks)
-	e.GET("/links/:code", GetLink)
-	e.DELETE("/links/:code", DeleteLink)
+	e.POST("/shorten", h.CreateLink)
+	e.GET("/links", h.GetLinks)
+	e.GET("/links/:code", h.GetLink)
+	e.DELETE("/links/:code", h.DeleteLink)
 	e.File("/", "public/index.html")
 	e.File("/404", "public/404.html")
-	e.GET("/:code", RedirectToUrl)
+	e.GET("/:code", h.RedirectToUrl)
 	e.File("/*", "public/404.html")
 
 	// Start server
 	e.Logger.Fatal(e.Start(viper.GetString(c.ServerAddr)))
-}
-
-// Handlers
-func CreateLink(c echo.Context) error {
-	var body = new(struct {
-		Url string `json:"url"`
-	})
-
-	if err := c.Bind(&body); err != nil {
-		return err
-	}
-
-	if body.Url == "" {
-		return c.JSON(http.StatusBadRequest, MissingRequiredUrlMsg)
-	}
-
-	counter := int(store.IncCount())
-	if code, err := h.Encode([]int{counter}); err != nil {
-		return c.JSON(http.StatusInternalServerError, err)
-	} else if link, err := store.Create(code, body.Url); err != nil {
-		return c.JSON(http.StatusInternalServerError, err)
-	} else {
-		return c.JSON(http.StatusOK, link)
-	}
-}
-
-func GetLinks(c echo.Context) error {
-	skip, _ := strconv.ParseInt(c.QueryParam("s"), 10, 64)
-	limit, _ := strconv.ParseInt(c.QueryParam("l"), 10, 64)
-	links := store.List(limit, skip)
-	return c.JSON(http.StatusOK, links)
-}
-
-func GetLink(c echo.Context) error {
-	if link, err := store.Read(c.Param("code")); err != nil {
-		return c.NoContent(http.StatusNotFound)
-	} else {
-		return c.JSON(http.StatusOK, link)
-	}
-}
-
-func DeleteLink(c echo.Context) error {
-	if count := store.Delete(c.Param("code")); count == 0 {
-		return c.NoContent(http.StatusNotFound)
-	} else {
-		return c.NoContent(http.StatusOK)
-	}
-}
-
-func RedirectToUrl(c echo.Context) error {
-	if link, err := store.Read(c.Param("code")); err != nil {
-		return c.Redirect(http.StatusTemporaryRedirect, "/404")
-	} else {
-		return c.Redirect(http.StatusMovedPermanently, link.LongUrl)
-	}
 }

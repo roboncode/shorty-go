@@ -1,9 +1,11 @@
 package consts
 
-const AuthKey = "AUTH_KEY"
-const BaseUrl = "BASE_URL"
-const Env = "ENV"
-const HashMin = "HASH_MIN"
-const HashSalt = "HASH_SALT"
-const ServerAddr = "SERVER_ADDR"
-const Store = "STORE"
+const (
+	AuthKey    = "AUTH_KEY"
+	BaseUrl    = "BASE_URL"
+	Env        = "ENV"
+	HashMin    = "HASH_MIN"
+	HashSalt   = "HASH_SALT"
+	ServerAddr = "SERVER_ADDR"
+	Store      = "STORE"
+)

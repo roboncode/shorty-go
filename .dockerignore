@@ -2,3 +2,4 @@ mongodb
 vendor
 .idea
 *_test.go
+mocks
