@@ -18,8 +18,8 @@
         </v-list-tile-content>
 
         <v-list-tile-action>
-          <v-btn icon ripple @click.stop.prevent="openLink(item)">
-            <v-icon color="grey lighten-1">pageview</v-icon>
+          <v-btn icon ripple dark color="primary" @click.stop.prevent="openLink(item)">
+            <v-icon>search</v-icon>
           </v-btn>
         </v-list-tile-action>
       </v-list-tile>

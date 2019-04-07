@@ -6,14 +6,15 @@ Vue.use(Vuex)
 
 export default new Vuex.Store({
   state: {
-    apiKey: '',
-    limit: 2,
+    apiKey: localStorage.getItem('shortlink_apikey'),
+    limit: 50,
     links: [],
     link: {}
   },
   mutations: {
     setApiKey(state, apiKey) {
       state.apiKey = apiKey
+      localStorage.setItem('shortlink_apikey', apiKey)
     },
     setLinks(state, links) {
       state.links = links
