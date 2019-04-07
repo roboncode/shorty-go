@@ -18,5 +18,8 @@ standalone:
 run:
 	./bin/urlshortener
 
+dev:
+	go run main.go
+
 test:
 	go test ./...
