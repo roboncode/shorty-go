@@ -1,6 +1,6 @@
 {
-  "name": "client",
-  "short_name": "client",
+  "name": "URL Shortener",
+  "short_name": "url_shortener",
   "icons": [
     {
       "src": "./img/icons/android-chrome-192x192.png",
