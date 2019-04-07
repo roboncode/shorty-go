@@ -15,9 +15,11 @@ build:
 
 standalone:
 	go build -o ./bin/urlshortener .
+	cp config.* bin
+	cp -rf public bin
 
 run:
-	./bin/urlshortener
+	cd ./bin && ./urlshortener
 
 dev:
 	go run main.go
