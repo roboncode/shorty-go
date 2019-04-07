@@ -31,7 +31,7 @@ func (h *Handler) CreateLink(c echo.Context) error {
 		return c.JSON(http.StatusBadRequest, MissingRequiredUrlMsg)
 	}
 
-	counter := int(h.Store.IncCount())
+	counter := h.Store.IncCount()
 	if code, err := h.HashID.Encode([]int{counter}); err != nil {
 		return c.JSON(http.StatusInternalServerError, err)
 	} else if link, err := h.Store.Create(code, body.Url); err != nil {
@@ -66,7 +66,8 @@ func (h *Handler) DeleteLink(c echo.Context) error {
 
 func (h *Handler) RedirectToUrl(c echo.Context) error {
 	if link, err := h.Store.Read(c.Param("code")); err != nil {
-		return c.Redirect(http.StatusTemporaryRedirect, "/404")
+		//return c.Redirect(http.StatusTemporaryRedirect, "/404")
+		return nil
 	} else {
 		return c.Redirect(http.StatusMovedPermanently, link.LongUrl)
 	}

@@ -94,10 +94,12 @@ func main() {
 	e.GET("/links", h.GetLinks)
 	e.GET("/links/:code", h.GetLink)
 	e.DELETE("/links/:code", h.DeleteLink)
-	e.File("/", "public/index.html")
+	//e.File("/", "public/index.html")
 	e.File("/404", "public/404.html")
 	e.GET("/:code", h.RedirectToUrl)
 	e.File("/*", "public/404.html")
+
+	e.Static("/", "public")
 
 	// Start server
 	e.Logger.Fatal(e.Start(viper.GetString(c.ServerAddr)))

@@ -3,3 +3,4 @@ vendor
 .idea
 *_test.go
 mocks
+client
