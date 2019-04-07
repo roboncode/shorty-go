@@ -28,10 +28,16 @@ make run
 
 Service will be available on http://localhost:8080
 
-## Running local
+## Running development
 
 ```
-go run main.go
+make dev
+```
+
+## Running tests
+
+```
+make test
 ```
 
 ## API
