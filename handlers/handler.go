@@ -66,8 +66,8 @@ func (h *Handler) DeleteLink(c echo.Context) error {
 
 func (h *Handler) RedirectToUrl(c echo.Context) error {
 	if link, err := h.Store.Read(c.Param("code")); err != nil {
-		//return c.Redirect(http.StatusTemporaryRedirect, "/404")
-		return nil
+		return c.Redirect(http.StatusTemporaryRedirect, "/404")
+		//return nil
 	} else {
 		return c.Redirect(http.StatusMovedPermanently, link.LongUrl)
 	}

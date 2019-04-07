@@ -1,8 +1,8 @@
 # :: SERVICE ::
 # Key passed as query param to access endpoints
-AUTH_KEY: "123456789"
+AUTH_KEY: "shorty"
 # The base url used by short urls to produce full url
-BASE_URL: "https://ac.me"
+BASE_URL: "http://localhost:8080"
 # Minimum size of hash code for short url
 HASH_MIN: 5
 # Seed used to start url hash (unique make it less predicable)

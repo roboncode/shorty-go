@@ -37,6 +37,15 @@ make dev
 make test
 ```
 
+### Admin Single Page Application (SPA)
+
+The default API key is `shorty`. It is built with [Vue.js](https://github.com/vuejs/vue). The source is
+found in the [web-client](web-client) directory.
+
+```
+GET /admin
+```
+
 ### API
 
 The API is pretty simple.
@@ -45,12 +54,13 @@ The API is pretty simple.
 Authentication required - uri?key=:authKey
 
 POST    /shorten                    body{ url:String }
-GET     /links?l=:limit&s=:skip     (Mongo only)
+GET     /links?l=:limit&s=:skip     (Mongo only right now)
 GET     /links/:code
 DELETE  /links/:code
 
 No Authentication required
 
+GET     /admin          Admin SPA
 GET     /               Landing page
 GET     /:code          Redirect to long url
 GET     /*              404 page

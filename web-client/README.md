@@ -1,4 +1,4 @@
-# client
+# Url Shortener Web Client
 
 ## Project setup
 ```

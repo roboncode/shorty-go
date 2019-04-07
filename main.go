@@ -75,14 +75,15 @@ func main() {
 		e.Use(middleware.Logger())
 	}
 	e.Use(middleware.Recover())
+	e.Use(middleware.Static("/public"))
 	e.Use(middleware.KeyAuthWithConfig(middleware.KeyAuthConfig{
 		KeyLookup: "query:key",
 		Skipper: func(e echo.Context) bool {
 			switch e.Path() {
-			case "/", "/404", "/:code", "/*":
-				return true
+			case "/shorten", "/links", "/links/:code":
+				return false
 			}
-			return false
+			return true
 		},
 		Validator: func(key string, e echo.Context) (bool, error) {
 			return key == viper.GetString(c.AuthKey), nil
@@ -90,16 +91,17 @@ func main() {
 	}))
 
 	// Routes
+	e.File("/admin", "public/admin/index.html")
+	e.File("/404", "public/404.html")
+	//e.File("/service-worker.js", "public/service-worker.js")
+	//e.File("webpack:///./src/registerServiceWorker.js", "public/registerServiceWorker.js")
+	//e.File("/manifest.json", "public/manifest.json")
 	e.POST("/shorten", h.CreateLink)
 	e.GET("/links", h.GetLinks)
 	e.GET("/links/:code", h.GetLink)
 	e.DELETE("/links/:code", h.DeleteLink)
-	//e.File("/", "public/index.html")
-	e.File("/404", "public/404.html")
 	e.GET("/:code", h.RedirectToUrl)
-	e.File("/*", "public/404.html")
-
-	e.Static("/", "public")
+	e.Static("/*", "public")
 
 	// Start server
 	e.Logger.Fatal(e.Start(viper.GetString(c.ServerAddr)))

@@ -5,8 +5,8 @@
         <v-progress-circular indeterminate size="48" color="grey lighten-2"></v-progress-circular>
       </v-layout>
       <v-layout v-else column align-center wrap>
-        <a :href="link.shortUrl" target="_blank" class="headline">{{link.shortUrl}}</a>
-        <a :href="link.longUrl" target="_blank" class="link">{{link.longUrl}}</a>
+        <a :href="link.shortUrl" target="_blank" class="shortUrl">{{link.shortUrl}}</a>
+        <a :href="link.longUrl" target="_blank" class="longUrl">{{link.longUrl}}</a>
       </v-layout>
     </v-flex>
     <v-footer v-if="!busy" app fixed>
@@ -51,18 +51,24 @@ export default {
 </script>
 
 <style lang="stylus" scoped>
-.headline
+.shortUrl
   padding 10px 20px
   background #1365c0
   color white
+  font-size 24px
+  line-height 32px
   border-radius 8px
   text-decoration none
   cursor pointer
+  max-width 310px
+  white-space nowrap
+  overflow hidden
+  text-overflow ellipsis
 
   &:hover
     background #267ee2
 
-.link
+.longUrl
   padding 16px
   font-size 18px
   /* These are technically the same, but use both */
