@@ -132,11 +132,11 @@ func TestHandler_DeleteLink(t *testing.T) {
 	c.SetParamNames("code")
 	c.SetParamValues("abc")
 
-	firstMockDB := mockDB[1]
+	//firstMockDB := mockDB[1]
 
 	mockStore := mocks.Store{}
-	mockStore.On("Read", c.Param("code")).Return(&firstMockDB, nil)
-	mockStore.On("Delete", c.Param("code")).Return(nil)
+	//mockStore.On("Read", c.Param("code")).Return(&firstMockDB, nil)
+	mockStore.On("Delete", c.Param("code")).Return(int64(1))
 
 	h := &Handler{
 		Store:  &mockStore,
@@ -144,7 +144,34 @@ func TestHandler_DeleteLink(t *testing.T) {
 	}
 
 	// Assertions
-	if assert.NoError(t, h.GetLink(c)) {
+	if assert.NoError(t, h.DeleteLink(c)) {
 		assert.Equal(t, http.StatusOK, rec.Code)
+	}
+}
+
+func TestHandler_RedirectToUrl(t *testing.T) {
+	// Setup
+	e := echo.New()
+	req := httptest.NewRequest(http.MethodGet, "/", nil)
+	req.Header.Set(echo.HeaderContentType, echo.MIMEApplicationJSON)
+	rec := httptest.NewRecorder()
+	c := e.NewContext(req, rec)
+	c.SetPath("/:code")
+	c.SetParamNames("code")
+	c.SetParamValues("abc")
+
+	firstMockDB := mockDB[1]
+
+	mockStore := mocks.Store{}
+	mockStore.On("Read", c.Param("code")).Return(&firstMockDB, nil)
+
+	h := &Handler{
+		Store:  &mockStore,
+		HashID: helpers.NewHashID(),
+	}
+
+	// Assertions
+	if assert.NoError(t, h.RedirectToUrl(c)) {
+		assert.Equal(t, http.StatusMovedPermanently, rec.Code)
 	}
 }
