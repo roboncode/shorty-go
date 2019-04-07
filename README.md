@@ -4,43 +4,40 @@ A simple URL shortener using Go and Mongo.
 
 This project was built using [Echo](https://echo.labstack.com/) and offers the option between two data stores:
 
-* [Badger](https://github.com/dgraph-io/badger) - Embedded Go Key/Value Database as a single standalone executable 
-* [Mongo](https://github.com/mongodb/mongo-go-driver) - Docker container that can run as a microservice
+* [Badger](https://github.com/dgraph-io/badger) - Embedded Go Key/Value Database as a single standalone executable. Great for light / mid-tier usage.
+* [Mongo](https://github.com/mongodb/mongo-go-driver) + [go-cache](github.com/patrickmn/go-cache) - Allows for greater control of data storage and clustered environments. 
 
-In addition, the Mongo database uses [go-cache](github.com/patrickmn/go-cache) as a ttl cache to prevent burdening the database with redundant requests.  
+Microservice runs on http://localhost:8080 by default.
 
-## Running as Docker container
+### Running standalone executable
 
-```
-make build
-make start
-```
-
-Service will be available on http://localhost:8080
-
-
-## Running standalone executable
+Give the code a quick spin by building a single exec with no external dependencies. Optional config.yaml file can be used for configuration or you can configure it as part of the command line.
 
 ```
 make standalone
 make run
 ```
 
-Service will be available on http://localhost:8080
+### Running as Docker container
 
-## Running development
+```
+make build
+make start
+```
+
+### Running development
 
 ```
 make dev
 ```
 
-## Running tests
+### Running tests
 
 ```
 make test
 ```
 
-## API
+### API
 
 The API is pretty simple.
 
@@ -48,7 +45,7 @@ The API is pretty simple.
 Authentication required - uri?key=:authKey
 
 POST    /shorten                    body{ url:String }
-GET     /links?l=:limit&s=:skip     *Mongo only
+GET     /links?l=:limit&s=:skip     (Mongo only)
 GET     /links/:code
 DELETE  /links/:code
 
@@ -59,11 +56,11 @@ GET     /:code          Redirect to long url
 GET     /*              404 page
 ```
 
-## Config and Env variables
+### Config and Env variables
 
-This service uses [Viper](https://github.com/spf13/viper) for it's configuration. The config.yaml contains all the 
-configurable variables. You can also override any variables as environment variables. You will see examples of this
-in the docker-compose.yml. You can also set the variables from the command line.
+URL shortener uses [Viper](https://github.com/spf13/viper) to handle configuration. The `config.yaml` contains all the 
+configurable variables and default values. You can also override any variables as environment variables. You will see examples of this
+in the `docker-compose.yml`. You can also set the variables from the command line.
 
 ```
 ENV=prod STORE=mongo ./bin/urlshortener
