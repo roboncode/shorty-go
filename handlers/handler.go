@@ -42,9 +42,9 @@ func (h *Handler) CreateLink(c echo.Context) error {
 }
 
 func (h *Handler) GetLinks(c echo.Context) error {
-	skip, _ := strconv.ParseInt(c.QueryParam("s"), 10, 64)
-	limit, _ := strconv.ParseInt(c.QueryParam("l"), 10, 64)
-	links := h.Store.List(int(limit), int(skip))
+	skip, _ := strconv.Atoi(c.QueryParam("s"))
+	limit, _ := strconv.Atoi(c.QueryParam("l"))
+	links := h.Store.List(limit, skip)
 	return c.JSON(http.StatusOK, links)
 }
 
