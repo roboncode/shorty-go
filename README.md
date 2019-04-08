@@ -13,14 +13,14 @@ Microservice runs on http://localhost:8080 by default.
 
 ```
 cd $GOPATH
-go get go get github.com/roboncode/shorty-go
+go get github.com/roboncode/shorty-go
 cd github.com/roboncode/shorty-go
 dep ensure
 
-# To run with Badger
+# To run with BadgerDb
 go run main.go 
 
-# To run with Mongo
+# To run with MongoDb
 make mongo
 STORE=mongo go run main.go
 ```
@@ -32,12 +32,22 @@ Give the code a quick spin by building a single exec with no external dependenci
 ```
 make standalone
 
-# Run with badger
+# Run with BadgerDb
+# Run on Linux
 make run
+# Run on Mac OSX
+make run_osx
+# Run on Windows
+make run_win
 
-# Run with mongo
+# Startup MongoDb instance
 make mongo
+# Run on Linux
 STORE=mongo make run
+# Run on Mac OSX
+STORE=mongo make run_osx
+# Run on Windows
+STORE=mongo make run_win
 ```
 
 ### Running as Docker container
@@ -50,10 +60,10 @@ make start
 ### Running development
 
 ```
-# Run with badger
+# Run with BadgerDb
 make dev
 
-# Run with mongo
+# Run with MongoDb
 make mongo
 STORE=mongo make dev
 ```
