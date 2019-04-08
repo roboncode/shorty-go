@@ -19,7 +19,7 @@ const (
 	// :: Config ::
 	MongoCacheCleanup      = "MONGO_CACHE_CLEANUP"
 	MongoCacheExp          = "MONGO_CACHE_EXP"
-	MongoCounterCollection = "MONGO_COL_COUNTER"
+	MongoCounterCollection = "MONGO_COL_COUNTERS"
 	MongoLinksCollection   = "MONGO_COL_LINKS"
 	MongoUrl               = "MONGO_URL"
 	MongoDb                = "MONGO_DB"
@@ -69,18 +69,30 @@ func (m *MongoStore) connect() *mongo.Database {
 	return client.Database(dbName)
 }
 
-func (m *MongoStore) ensureIndexes() {
-	collection := m.db.Collection(viper.GetString(MongoLinksCollection))
-	_, err := collection.Indexes().CreateOne(
+func (m *MongoStore) ensureIndex(col *mongo.Collection, field string, unique bool) {
+	_, err := col.Indexes().CreateOne(
 		context.Background(),
 		mongo.IndexModel{
-			Keys:    bsonx.Doc{{"code", bsonx.Int32(1)}},
-			Options: options.Index().SetUnique(true).SetBackground(true),
+			Keys:    bsonx.Doc{{field, bsonx.Int32(1)}},
+			Options: options.Index().SetUnique(unique).SetBackground(true),
 		},
 	)
 	if err != nil {
 		log.Fatal(err)
 	}
+}
+
+func (m *MongoStore) ensureIndexes() {
+	var collection *mongo.Collection
+
+	collection = m.db.Collection(viper.GetString(MongoCounterCollection))
+	m.ensureIndex(collection, "name", true)
+
+	collection = m.db.Collection(viper.GetString(MongoLinksCollection))
+	m.ensureIndex(collection, "code", true)
+
+	collection = m.db.Collection(viper.GetString(MongoLinksCollection))
+	m.ensureIndex(collection, "created", false)
 }
 
 func (m *MongoStore) IncCount() int {
@@ -90,7 +102,7 @@ func (m *MongoStore) IncCount() int {
 	opts := options.FindOneAndUpdateOptions{}
 	opts.SetUpsert(true)
 	opts.SetReturnDocument(options.ReturnDocument(options.After))
-	err := collection.FindOneAndUpdate(ctx, bson.M{}, bson.M{"$inc": bson.M{"value": 1}}, &opts).Decode(&counter)
+	err := collection.FindOneAndUpdate(ctx, bson.M{"name": "shorty"}, bson.M{"$inc": bson.M{"value": 1}}, &opts).Decode(&counter)
 	if err != nil {
 		return 0
 	}

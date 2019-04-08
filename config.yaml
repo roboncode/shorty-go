@@ -24,7 +24,7 @@ MONGO_CACHE_EXP: 15
 # Number of minutes cleanup should remove expired urls (mongo only)
 MONGO_CACHE_CLEANUP: 60
 # [!] Mongo uses two collections
-MONGO_COL_COUNTER: "counters"
+MONGO_COL_COUNTERS: "counters"
 MONGO_COL_LINKS: "links"
 
 
