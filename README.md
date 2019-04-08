@@ -67,7 +67,7 @@ The API is pretty simple.
 Authentication required - uri?key=:authKey
 
 POST    /shorten                    body{ url:String }
-GET     /links?l=:limit&s=:skip     (Mongo only right now)
+GET     /links?l=:limit&s=:skip     (Mongo works, Badger in progress)
 GET     /links/:code
 DELETE  /links/:code
 
