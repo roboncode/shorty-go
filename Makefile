@@ -14,12 +14,20 @@ build:
 	docker build -t roboncode/urlshortener .
 
 standalone:
-	go build -o ./bin/urlshortener .
-	cp config.* bin
-	cp -rf public bin
+	GOOS=darwin GOARCH=amd64 go build -o ./bin/osx_urlshortener .
+	GOOS=linux GOARCH=amd64 go build -o ./bin/urlshortener .
+	GOOS=windows GOARCH=386 go build -o ./bin/urlshortener.exe .
+	cp config.* ./bin
+	cp -rf public ./bin
 
 run:
 	cd ./bin && ./urlshortener
+
+run_osx:
+	cd ./bin && ./osx_urlshortener
+
+run_win:
+	cd ./bin && ./urlshortener.exe
 
 dev:
 	go run main.go
