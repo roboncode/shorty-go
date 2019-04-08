@@ -36,7 +36,7 @@ type MongoStore struct {
 func NewMongoStore() Store {
 	viper.SetDefault(MongoCacheCleanup, 60)
 	viper.SetDefault(MongoCacheExp, 15)
-	viper.SetDefault(MongoCounterCollection, "counter")
+	viper.SetDefault(MongoCounterCollection, "counters")
 	viper.SetDefault(MongoLinksCollection, "links")
 	viper.SetDefault(MongoUrl, "mongodb://localhost:27017")
 	viper.SetDefault(MongoDb, "shorturls")

@@ -93,9 +93,6 @@ func main() {
 	// Routes
 	e.File("/admin", "public/admin/index.html")
 	e.File("/404", "public/404.html")
-	//e.File("/service-worker.js", "public/service-worker.js")
-	//e.File("webpack:///./src/registerServiceWorker.js", "public/registerServiceWorker.js")
-	//e.File("/manifest.json", "public/manifest.json")
 	e.POST("/shorten", h.CreateLink)
 	e.GET("/links", h.GetLinks)
 	e.GET("/links/:code", h.GetLink)

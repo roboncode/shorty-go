@@ -15,7 +15,7 @@ STORE: "badger"
 
 # :: MONGO DB ::
 # MongoDb address
-MONGO_URL: "mongodb://localhost:28000"
+MONGO_URL: "mongodb://localhost:28017"
 # Name of the mongo database
 MONGO_DB: "shorturls"
 # [!] Mongo caches queries to reduce calls to database
@@ -24,7 +24,7 @@ MONGO_CACHE_EXP: 15
 # Number of minutes cleanup should remove expired urls (mongo only)
 MONGO_CACHE_CLEANUP: 60
 # [!] Mongo uses two collections
-MONGO_COL_COUNTER: "counter"
+MONGO_COL_COUNTER: "counters"
 MONGO_COL_LINKS: "links"
 
 
