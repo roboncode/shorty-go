@@ -210,21 +210,6 @@
   version = "v1.0.0"
 
 [[projects]]
-  branch = "master"
-  digest = "1:d94ac283f9491d9ad63770b174cbef55270cfc6e916f40fa630d135ce6ece754"
-  name = "github.com/roboncode/shorty-go"
-  packages = [
-    "consts",
-    "handlers",
-    "helpers",
-    "models",
-    "stores",
-    "stores/mocks",
-  ]
-  pruneopts = "UT"
-  revision = "5c25d21657dfaf0074de5e3b32a6b7a309e9c461"
-
-[[projects]]
   digest = "1:b749dfc1b2734006da71966102ca708c5575081590f4bbfa7bf6ba1979f04ee9"
   name = "github.com/speps/go-hashids"
   packages = ["."]
@@ -454,12 +439,6 @@
     "github.com/labstack/echo/middleware",
     "github.com/labstack/gommon/color",
     "github.com/patrickmn/go-cache",
-    "github.com/roboncode/shorty-go/consts",
-    "github.com/roboncode/shorty-go/handlers",
-    "github.com/roboncode/shorty-go/helpers",
-    "github.com/roboncode/shorty-go/models",
-    "github.com/roboncode/shorty-go/stores",
-    "github.com/roboncode/shorty-go/stores/mocks",
     "github.com/speps/go-hashids",
     "github.com/spf13/viper",
     "github.com/stretchr/testify/assert",

@@ -9,6 +9,22 @@ This project was built using [Echo](https://echo.labstack.com/) and offers the o
 
 Microservice runs on http://localhost:8080 by default.
 
+### Getting started
+
+```
+cd $GOPATH
+go get go get github.com/roboncode/shorty-go
+cd github.com/roboncode/shorty-go
+dep ensure
+
+# To run with Badger
+go run main.go 
+
+# To run with Mongo
+make mongo
+STORE=mongo go run main.go
+```
+
 ### Running standalone executable
 
 Give the code a quick spin by building a single exec with no external dependencies. Optional config.yaml file can be used for configuration or you can configure it as part of the command line.
