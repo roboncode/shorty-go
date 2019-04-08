@@ -4,7 +4,7 @@
       <v-layout v-if="busy" column align-center>
         <v-progress-circular indeterminate size="48" color="grey lighten-2"></v-progress-circular>
       </v-layout>
-      <v-layout v-else column align-center wrap>
+      <v-layout v-else column align-center justify-center wrap>
         <a :href="link.shortUrl" target="_blank" class="shortUrl">{{link.shortUrl}}</a>
         <a :href="link.longUrl" target="_blank" class="longUrl">{{link.longUrl}}</a>
       </v-layout>
@@ -40,12 +40,21 @@ export default {
       this.deleteLink(link.code).then(() => {
         this.$router.push({ name: 'links' })
       })
+    },
+    getLinks() {
+      this.busy = true
+      this.fetchLink(this.$route.params.code).then(() => {
+        this.busy = false
+      })
+    }
+  },
+  watch: {
+    $route() {
+      this.getLinks()
     }
   },
   created() {
-    this.fetchLink(this.$route.params.code).then(() => {
-      this.busy = false
-    })
+    this.getLinks()
   }
 }
 </script>
@@ -60,10 +69,13 @@ export default {
   border-radius 8px
   text-decoration none
   cursor pointer
-  max-width 310px
   white-space nowrap
   overflow hidden
   text-overflow ellipsis
+
+  @media only screen and (orientation: portrait) and (min-width: 360px)
+    font-size 18px
+    max-width 310px
 
   &:hover
     background #267ee2
@@ -71,6 +83,7 @@ export default {
 .longUrl
   padding 16px
   font-size 18px
+  text-align center
   /* These are technically the same, but use both */
   overflow-wrap break-word
   word-wrap break-word
@@ -84,4 +97,8 @@ export default {
   -moz-hyphens auto
   -webkit-hyphens auto
   hyphens auto
+
+  @media only screen and (orientation: portrait) and (min-width: 360px)
+    font-size 16px
+    text-align left
 </style>

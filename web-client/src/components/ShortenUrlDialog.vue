@@ -5,7 +5,7 @@
       <v-container grid-list-sm class="pa-4">
         <v-layout row wrap>
           <v-flex xs12>
-            <v-text-field outline clearable label="Type URL here..." v-model="url"></v-text-field>
+            <v-text-field outline clearable label="Type URL here..." v-model="url" @keypress.enter="shortenUrl"></v-text-field>
           </v-flex>
         </v-layout>
       </v-container>
@@ -41,7 +41,7 @@ export default {
       this.createLink(this.url).then(({data}) => {
         this.$router.push(`/links/${data.code}`)
       }, ({data}) => {
-        console.log('whoops', data)
+        console.error('Whoops!', data)
       })
       this.close()
     }

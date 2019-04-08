@@ -5,7 +5,7 @@
       <v-container grid-list-sm>
         <v-layout row wrap>
           <v-flex xs12>
-            <v-text-field outline clearable label="API Key" v-model="apiKey"></v-text-field>
+            <v-text-field outline clearable label="API Key" v-model="apiKey" @keypress.enter="save"></v-text-field>
           </v-flex>
         </v-layout>
       </v-container>
