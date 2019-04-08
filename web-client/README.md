@@ -1,28 +1,39 @@
 # Url Shortener Web Client
 
+The web application requires `Node.js` and `yarn`.
+ 
+
 ## Project setup
 ```
+# Install yarn if you don't have it installed already
+npm i -g yarn
+
+# Install project dependencies
 yarn install
 ```
 
 ### Compiles and hot-reloads for development
+
 ```
-yarn run serve
+yarn serve
 ```
 
 ### Compiles and minifies for production
+
 ```
-yarn run build
+yarn build
 ```
 
 ### Run your tests
+
 ```
-yarn run test
+yarn test
 ```
 
 ### Lints and fixes files
+
 ```
-yarn run lint
+yarn lint
 ```
 
 ### Customize configuration

@@ -1,6 +1,6 @@
 # Url Shortener built with Go
 
-A simple URL shortener using Go and Mongo.
+A microservice used to shorten URLs built with Go.
 
 This project was built using [Echo](https://echo.labstack.com/) and offers the option between two data stores:
 
@@ -15,7 +15,13 @@ Give the code a quick spin by building a single exec with no external dependenci
 
 ```
 make standalone
+
+# Run with badger
 make run
+
+# Run with mongo
+make mongo
+STORE=mongo make run
 ```
 
 ### Running as Docker container
@@ -28,7 +34,12 @@ make start
 ### Running development
 
 ```
+# Run with badger
 make dev
+
+# Run with mongo
+make mongo
+STORE=mongo make dev
 ```
 
 ### Running tests
@@ -39,12 +50,14 @@ make test
 
 ### Admin Single Page Application (SPA)
 
-The default API key is `shorty`. It is built with [Vue.js](https://github.com/vuejs/vue). The source is
+The default API key in [config.yaml](config.yaml) is `shorty`. The web app is built with [Vue.js](https://github.com/vuejs/vue). The source is
 found in the [web-client](web-client) directory.
 
 ```
 GET /admin
 ```
+
+> See notes [web-client/README.md](web-client/README.md) for instructions on running and building the web app.
 
 ### API
 
