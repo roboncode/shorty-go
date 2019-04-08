@@ -3,7 +3,7 @@ package helpers
 import (
 	"crypto/md5"
 	"encoding/hex"
-	c "github.com/roboncode/go-urlshortener/consts"
+	c "github.com/roboncode/shorty-go/consts"
 	"github.com/speps/go-hashids"
 	"github.com/spf13/viper"
 )

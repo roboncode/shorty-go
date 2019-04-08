@@ -4,8 +4,8 @@ import (
 	"context"
 	"github.com/labstack/gommon/color"
 	"github.com/patrickmn/go-cache"
-	"github.com/roboncode/go-urlshortener/helpers"
-	"github.com/roboncode/go-urlshortener/models"
+	"github.com/roboncode/shorty-go/helpers"
+	"github.com/roboncode/shorty-go/models"
 	"github.com/spf13/viper"
 	"go.mongodb.org/mongo-driver/bson"
 	"go.mongodb.org/mongo-driver/mongo"
@@ -70,7 +70,7 @@ func (m *MongoStore) connect() *mongo.Database {
 }
 
 func (m *MongoStore) ensureIndexes() {
-	collection := m.db.Collection(MongoLinksCollection)
+	collection := m.db.Collection(viper.GetString(MongoLinksCollection))
 	_, err := collection.Indexes().CreateOne(
 		context.Background(),
 		mongo.IndexModel{
@@ -85,7 +85,7 @@ func (m *MongoStore) ensureIndexes() {
 
 func (m *MongoStore) IncCount() int {
 	var counter models.Counter
-	collection := m.db.Collection(MongoCounterCollection)
+	collection := m.db.Collection(viper.GetString(MongoCounterCollection))
 	ctx, _ := context.WithTimeout(context.Background(), 5*time.Second)
 	opts := options.FindOneAndUpdateOptions{}
 	opts.SetUpsert(true)
@@ -99,7 +99,7 @@ func (m *MongoStore) IncCount() int {
 
 func (m *MongoStore) Create(code string, longUrl string) (*models.Link, error) {
 	var link models.Link
-	collection := m.db.Collection(MongoLinksCollection)
+	collection := m.db.Collection(viper.GetString(MongoLinksCollection))
 	ctx, _ := context.WithTimeout(context.Background(), 5*time.Second)
 	if err := collection.FindOne(ctx, bson.M{
 		"longUrl": longUrl,
@@ -127,7 +127,7 @@ func (m *MongoStore) Read(code string) (*models.Link, error) {
 	if found {
 		link = cachedItem.(*models.Link)
 	} else {
-		collection := m.db.Collection(MongoLinksCollection)
+		collection := m.db.Collection(viper.GetString(MongoLinksCollection))
 		ctx, _ := context.WithTimeout(context.Background(), 5*time.Second)
 		err = collection.FindOne(ctx, bson.M{
 			"code": code,
@@ -144,7 +144,7 @@ func (m *MongoStore) Read(code string) (*models.Link, error) {
 }
 
 func (m *MongoStore) Delete(code string) int {
-	collection := m.db.Collection(MongoLinksCollection)
+	collection := m.db.Collection(viper.GetString(MongoLinksCollection))
 	ctx, _ := context.WithTimeout(context.Background(), 5*time.Second)
 	result, _ := collection.DeleteOne(ctx, bson.M{
 		"code": code,
@@ -156,7 +156,7 @@ func (m *MongoStore) Delete(code string) int {
 func (m *MongoStore) List(limit int, skip int) []models.Link {
 	// https://danott.co/posts/json-marshalling-empty-slices-to-empty-arrays-in-go.html
 	links := make([]models.Link, 0) // Do this to ensure empty array
-	collection := m.db.Collection(MongoLinksCollection)
+	collection := m.db.Collection(viper.GetString(MongoLinksCollection))
 	ctx, _ := context.WithTimeout(context.Background(), 5*time.Second)
 	l := int64(limit)
 	s := int64(skip)

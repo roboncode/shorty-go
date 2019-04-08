@@ -2,8 +2,8 @@ package stores
 
 import (
 	"github.com/dgraph-io/badger"
-	"github.com/roboncode/go-urlshortener/helpers"
-	"github.com/roboncode/go-urlshortener/models"
+	"github.com/roboncode/shorty-go/helpers"
+	"github.com/roboncode/shorty-go/models"
 	"github.com/spf13/viper"
 	"os"
 	"time"

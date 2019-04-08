@@ -1,4 +1,4 @@
-# Url Shortener Web Client
+# Shorty Web Client
 
 The web application requires `Node.js` and `yarn`.
  

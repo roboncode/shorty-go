@@ -11,23 +11,23 @@ mongo:
 	docker-compose up -d db
 
 build:
-	docker build -t roboncode/urlshortener .
+	docker build -t roboncode/shorty .
 
 standalone:
-	GOOS=darwin GOARCH=amd64 go build -o ./bin/osx_urlshortener .
-	GOOS=linux GOARCH=amd64 go build -o ./bin/urlshortener .
-	GOOS=windows GOARCH=386 go build -o ./bin/urlshortener.exe .
+	GOOS=darwin GOARCH=amd64 go build -o ./bin/shorty_osx .
+	GOOS=linux GOARCH=amd64 go build -o ./bin/shorty .
+	GOOS=windows GOARCH=386 go build -o ./bin/shorty.exe .
 	cp config.* ./bin
 	cp -rf public ./bin
 
 run:
-	cd ./bin && ./urlshortener
+	cd ./bin && ./shorty
 
 run_osx:
-	cd ./bin && ./osx_urlshortener
+	cd ./bin && ./shorty_osx
 
 run_win:
-	cd ./bin && ./urlshortener.exe
+	cd ./bin && ./shorty.exe
 
 dev:
 	go run main.go

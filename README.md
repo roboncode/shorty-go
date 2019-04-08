@@ -1,4 +1,4 @@
-# Url Shortener built with Go
+# Shortens URLs like bit.ly written in Go
 
 A microservice used to shorten URLs built with Go.
 
@@ -81,12 +81,12 @@ GET     /*              404 page
 
 ### Config and Env variables
 
-URL shortener uses [Viper](https://github.com/spf13/viper) to handle configuration. The `config.yaml` contains all the 
+Shorty uses [Viper](https://github.com/spf13/viper) to handle configuration. The `config.yaml` contains all the 
 configurable variables and default values. You can also override any variables as environment variables. You will see examples of this
 in the `docker-compose.yml`. You can also set the variables from the command line.
 
 ```
-ENV=prod STORE=mongo ./bin/urlshortener
+ENV=prod STORE=mongo ./bin/shorty
 ```
 
 Feel free to fork it, hack it and use it any way you please.

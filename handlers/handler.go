@@ -2,7 +2,7 @@ package handlers
 
 import (
 	"github.com/labstack/echo"
-	"github.com/roboncode/go-urlshortener/stores"
+	"github.com/roboncode/shorty-go/stores"
 	"github.com/speps/go-hashids"
 	"net/http"
 	"strconv"

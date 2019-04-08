@@ -1,8 +1,8 @@
 package helpers
 
 import (
-	"github.com/roboncode/go-urlshortener/consts"
-	"github.com/roboncode/go-urlshortener/models"
+	"github.com/roboncode/shorty-go/consts"
+	"github.com/roboncode/shorty-go/models"
 	"github.com/spf13/viper"
 	"github.com/stretchr/testify/assert"
 	"testing"

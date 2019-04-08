@@ -15,7 +15,7 @@ STORE: "badger"
 
 # :: MONGO DB ::
 # MongoDb address
-MONGO_URL: "mongodb://localhost:27017"
+MONGO_URL: "mongodb://localhost:28000"
 # Name of the mongo database
 MONGO_DB: "shorturls"
 # [!] Mongo caches queries to reduce calls to database

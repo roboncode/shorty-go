@@ -9,7 +9,7 @@
       flat
     >
       <v-toolbar-title style="width: 300px" class="ml-0 pl-3">
-        <div class="clickable" @click="$router.push('/')">URL Shortener</div>
+        <div class="clickable" @click="$router.push('/')">Shorty</div>
         <v-btn
           fab
           absolute

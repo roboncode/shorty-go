@@ -212,7 +212,7 @@
 [[projects]]
   branch = "master"
   digest = "1:d94ac283f9491d9ad63770b174cbef55270cfc6e916f40fa630d135ce6ece754"
-  name = "github.com/roboncode/go-urlshortener"
+  name = "github.com/roboncode/shorty-go"
   packages = [
     "consts",
     "handlers",
@@ -454,12 +454,12 @@
     "github.com/labstack/echo/middleware",
     "github.com/labstack/gommon/color",
     "github.com/patrickmn/go-cache",
-    "github.com/roboncode/go-urlshortener/consts",
-    "github.com/roboncode/go-urlshortener/handlers",
-    "github.com/roboncode/go-urlshortener/helpers",
-    "github.com/roboncode/go-urlshortener/models",
-    "github.com/roboncode/go-urlshortener/stores",
-    "github.com/roboncode/go-urlshortener/stores/mocks",
+    "github.com/roboncode/shorty-go/consts",
+    "github.com/roboncode/shorty-go/handlers",
+    "github.com/roboncode/shorty-go/helpers",
+    "github.com/roboncode/shorty-go/models",
+    "github.com/roboncode/shorty-go/stores",
+    "github.com/roboncode/shorty-go/stores/mocks",
     "github.com/speps/go-hashids",
     "github.com/spf13/viper",
     "github.com/stretchr/testify/assert",

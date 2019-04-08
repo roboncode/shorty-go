@@ -2,23 +2,24 @@ version: '3.3'
 services:
 
   app:
-    image: "roboncode/urlshortener"
+    image: "roboncode/shorty"
+    container_name: "shorty"
     tty: false
     restart: always
     ports:
       - 8080:8080
     environment:
       - ENV=prod
-      - MONGO_URL=mongodb://mongo_urlshortener:27017
+      - MONGO_URL=mongodb://shorty-mongo:27017
       - STORE=mongo
     depends_on:
       - db
 
   db:
     image: mongo
-    container_name: "mongo_urlshortener"
+    container_name: "shorty-mongo"
     ports:
-      - 27017:27017
+      - 28017:27017
     volumes:
       - ./data/mongo:/data/db
 
